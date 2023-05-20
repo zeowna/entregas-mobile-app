@@ -1,0 +1,7 @@
+{
+  "name": "gas-delivery-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
