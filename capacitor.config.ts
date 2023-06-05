@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'gas-delivery-app',
+  appName: 'entregas-mobile-app',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
