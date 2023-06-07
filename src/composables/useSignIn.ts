@@ -1,10 +1,12 @@
 import { Api } from '@/services/api/Api';
 import { store } from '@/store';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import jwtDecode from 'jwt-decode'
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators'
 import router from '@/router';
+import { Dialog } from '@capacitor/dialog';
+import { loadingController } from '@ionic/vue';
 
 
 export const useSignIn = () => {
@@ -13,7 +15,7 @@ export const useSignIn = () => {
     password: ''
   })
 
-  const rules = {
+  const rules = computed(() => ({
     email: {
       required: helpers.withMessage('Preencha seu E-mail', required),
       email: helpers.withMessage('Preencha com um E-mail válido', email),
@@ -21,13 +23,21 @@ export const useSignIn = () => {
     password: {
       required: helpers.withMessage('Preencha sua Senha', required)
     }
-  }
+  }))
 
-  const v$ = useVuelidate(rules, credentials)
+  const v$ = useVuelidate(rules, credentials, { $stopPropagation: true })
 
-  const authUser = async (credentials: { email: string, password: string }) => {
+  const showLoading = async () => {
+    const loading = await loadingController.create({
+      message: 'Entrando...',
+    });
+    await loading.present();
 
-    const { authorization_token } = await Api.auth.signIn(credentials.email, credentials.password)
+    return loading;
+  };
+
+  const authUser = async () => {
+    const { authorization_token } = await Api.auth.signIn(credentials.value.email, credentials.value.password)
 
     localStorage.setItem('authorization', authorization_token)
 
@@ -40,16 +50,29 @@ export const useSignIn = () => {
   }
 
   const signIn = async () => {
-    const result = await v$.value.$validate()
+    const loading = await showLoading()
 
-    if (!result) {
-      return;
+    try {
+      const result = await v$.value.$validate()
+
+      if (!result) {
+        return;
+      }
+
+      const decoded = await authUser();
+      await findUser(decoded.sub)
+
+      await router.push('/tabs/')
+    } catch (err) {
+      await Dialog.alert({
+        title: 'Erro ao entrar',
+        message: err instanceof Error
+          ? err.message
+          : err as string,
+      });
+    } finally {
+      await loading.dismiss()
     }
-
-    const decoded = await authUser(credentials.value);
-    await findUser(decoded.sub)
-
-    await router.push('/tabs/')
   }
 
   return {

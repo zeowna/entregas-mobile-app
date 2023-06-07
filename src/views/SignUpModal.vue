@@ -25,7 +25,8 @@
 
             <ion-label position="stacked">CPF</ion-label>
             <ion-input v-model="user.cpf" type="text" placeholder="Seu CPF" aria-label="CPF" maxlength="11"/>
-            <input-error :prop="v$.cpf"/>
+            <input-error :prop="v$.cpf" :error="errorsFromRequest?.cpf"/>
+
 
             <ion-label position="stacked">Data de Nascimento</ion-label>
             <br v-show="!presentBirthday"/>
@@ -49,7 +50,7 @@
           <ion-card-content>
             <ion-label position="stacked">E-mail</ion-label>
             <ion-input v-model="user.email" type="text" placeholder="Seu E-mail" aria-label="E-mail"/>
-            <input-error :prop="v$.email"/>
+            <input-error :prop="v$.email" :error="errorsFromRequest?.email"/>
 
 
             <ion-label position="stacked">Senha</ion-label>
@@ -111,12 +112,11 @@ const close = () => {
   modal.value.$el.dismiss()
 }
 
-const { user, createUser, v$ } = useSignUp()
+const { user, createUser, v$, errorsFromRequest } = useSignUp()
 const { credentials, signIn } = useSignIn()
 
 const createUserAndSignIn = async () => {
-
-  if (await createUser(user.value)) {
+  if (await createUser()) {
     credentials.value = {
       email: user.value.email,
       password: user.value.password as string

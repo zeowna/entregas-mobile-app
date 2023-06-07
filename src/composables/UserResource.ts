@@ -9,8 +9,6 @@ export class UserResource extends AbstractResource {
   }
 
   async create(user: User) {
-    const { data } = await this.client.post<User>('/users', user)
-
-    return data
+    return super.post<User>('/users', user)
   }
 }
