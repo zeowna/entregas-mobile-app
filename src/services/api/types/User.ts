@@ -14,6 +14,6 @@ export interface User extends Entity {
   email: string
   type: UserTypes
   profilePictureURI?: string
-  address?: Address
+  addresses?: Address[]
   password?: string
 }

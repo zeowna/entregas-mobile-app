@@ -18,7 +18,7 @@
 
             <ion-input placeholder="Senha" type="password" v-model="credentials.password"/>
             <input-error :prop="v$.password"/>
-            
+
             <ion-button expand="block" type="submit">Entrar</ion-button>
 
             <br/>
@@ -69,6 +69,7 @@ import SignUpModal from '@/views/SignUpModal.vue';
 import InputError from '@/components/InputError.vue';
 
 const { credentials, signIn, v$ } = useSignIn()
+
 
 </script>
 

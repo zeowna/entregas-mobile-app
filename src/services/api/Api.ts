@@ -3,16 +3,8 @@ import axios from 'axios';
 import { store } from '@/store';
 import { OrdersResource } from '@/services/api/OrdersResource';
 import { UserResource } from '@/composables/UserResource';
-import { AbstractResource } from '@/services/api/AbstractResource';
+import { AuthResource } from '@/services/api/AuthResource';
 
-
-class AuthResource extends AbstractResource {
-  async signIn(email: string, password: string) {
-    const { data } = await this.client.post('/auth', { email, password })
-
-    return data
-  }
-}
 
 export class Api {
   static client = axios.create({ baseURL: store.state.baseURL })
