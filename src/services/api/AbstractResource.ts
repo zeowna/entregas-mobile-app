@@ -1,6 +1,5 @@
 import { AxiosError, AxiosInstance } from 'axios';
-import { NotFoundError } from '@/services/api/errors';
-import { BadRequestError } from '@/services/api/errors/BadRequestError';
+import { BadRequestError, NotFoundError } from '@/services/api/errors';
 
 
 export abstract class AbstractResource {
