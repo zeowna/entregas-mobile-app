@@ -1,16 +1,24 @@
-import { PartnersResource } from '@/services/api/PartnersResource';
-import axios from 'axios';
-import { store } from '@/store';
-import { OrdersResource } from '@/services/api/OrdersResource';
-import { UserResource } from '@/composables/UserResource';
-import { AuthResource } from '@/services/api/AuthResource';
-
+import { computed } from 'vue'
+import axios from 'axios'
+import { AuthResource } from './AuthResource'
+import { PartnersResource } from './PartnersResource'
+import { OrdersResource } from './OrdersResource'
+import { CustomersResource } from './CustomersResource'
+import { store } from '@/store'
+import { ProductsResource } from '@/services/api/ProductsResource'
+import { AddressesResource } from '@/services/api/AddressesResource'
+import { AdminResource } from '@/services/api/types/AdminResource'
+import { MeResource } from '@/services/api/MeResource'
 
 export class Api {
-  static client = axios.create({ baseURL: store.state.baseURL })
+  static client = computed(() => axios.create({ baseURL: store?.getters?.getBaseUrl }))
 
   static auth = new AuthResource(Api.client)
+  static me = new MeResource(Api.client)
+  static addresses = new AddressesResource(Api.client)
   static partners = new PartnersResource(Api.client)
   static orders = new OrdersResource(Api.client)
-  static users = new UserResource(Api.client)
+  static customers = new CustomersResource(Api.client)
+  static products = new ProductsResource(Api.client)
+  static admin = new AdminResource(Api.client)
 }

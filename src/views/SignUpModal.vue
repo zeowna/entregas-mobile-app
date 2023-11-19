@@ -1,5 +1,5 @@
 <template>
-  <ion-modal ref="modal" :trigger="trigger">
+  <ion-modal :isOpen="visible">
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
@@ -9,7 +9,6 @@
     </ion-header>
     <ion-content>
       <form @submit.prevent="createUserAndSignIn">
-
         <ion-card>
           <ion-card-header>
             <ion-card-title>
@@ -22,7 +21,6 @@
             <ion-label position="stacked">Nome</ion-label>
             <ion-input v-model="user.name" type="text" placeholder="Seu nome" aria-label="Nome"/>
             <input-error :prop="v$.name"/>
-            <ErrorMessage name="name"/>
 
             <ion-label position="stacked">CPF</ion-label>
             <ion-input v-model="user.cpf" type="text" placeholder="Seu CPF" aria-label="CPF" maxlength="11"/>
@@ -99,19 +97,27 @@ import AppTitle from '@/components/AppTitle.vue';
 import { DateTime } from 'luxon';
 import InputError from '@/components/InputError.vue';
 
-defineProps<{ trigger: string }>()
+defineProps({
+  visible: {
+    type: Boolean,
+    default: false
+  }
+})
 
-const modal = ref()
 const formattedBirthday = computed(
     () => user.value?.birthday
         ? DateTime.fromISO(user.value?.birthday as string).toLocaleString()
         : ''
 )
+
 const presentBirthday = ref(false)
 
+const emit = defineEmits(['close'])
+
 const close = () => {
-  modal.value.$el.dismiss()
+  emit('close')
 }
+
 
 const { user, createUser, v$, errorsFromRequest } = useSignUp()
 const { credentials, signIn } = useSignIn()

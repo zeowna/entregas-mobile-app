@@ -25,7 +25,7 @@
 
             <ion-row>
               <ion-col class="ion-text-center">
-                <a>Esqueci minha senha</a>
+                <a @click="forgotPassword">Esqueci minha senha</a>
               </ion-col>
             </ion-row>
           </ion-card-content>
@@ -51,11 +51,11 @@
 
       <ion-row>
         <ion-col class="ion-text-center">
-          <a id="open-modal">Criar conta com E-mail</a>
+          <a @click="openSignUpModal">Criar conta com E-mail</a>
         </ion-col>
       </ion-row>
 
-      <SignUpModal trigger="open-modal"/>
+      <SignUpModal :visible="visible" @close="close"/>
     </ion-content>
   </ion-page>
 </template>
@@ -67,8 +67,18 @@ import AppTitle from '@/components/AppTitle.vue';
 import { useSignIn } from '@/composables';
 import SignUpModal from '@/views/SignUpModal.vue';
 import InputError from '@/components/InputError.vue';
+import { ref } from "vue";
 
-const { credentials, signIn, v$ } = useSignIn()
+const { credentials, signIn, forgotPassword, v$ } = useSignIn()
+const visible = ref(false)
+
+const openSignUpModal = () => {
+  visible.value = true
+}
+
+const close = () => {
+  visible.value = false
+}
 
 
 </script>

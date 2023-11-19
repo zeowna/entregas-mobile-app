@@ -17,8 +17,8 @@ export const useSignIn = () => {
 
   const rules = computed(() => ({
     email: {
-      required: helpers.withMessage('Preencha seu E-mail', required),
-      email: helpers.withMessage('Preencha com um E-mail válido', email),
+      required: helpers.withMessage('E-mai é obrigatório', required),
+      email: helpers.withMessage('E-mail precisa ser um e-mail', email),
     },
     password: {
       required: helpers.withMessage('Preencha sua Senha', required)
@@ -39,14 +39,14 @@ export const useSignIn = () => {
   const authUser = async () => {
     const { authorization_token } = await Api.auth.signIn(credentials.value.email, credentials.value.password)
 
-    localStorage.setItem('authorization', authorization_token)
+    localStorage.setItem('token', authorization_token)
 
     return jwtDecode(authorization_token) as any
   }
 
-  const findUser = async (id: number) => {
-    const user = await Api.users.findById(id)
-    await store.dispatch('saveUser', user)
+  const findCustomer = async (id: number) => {
+    const user = await Api.customers.findById(id)
+    await store.dispatch('saveCustomer', user)
   }
 
   const signIn = async () => {
@@ -60,7 +60,7 @@ export const useSignIn = () => {
       }
 
       const decoded = await authUser();
-      await findUser(decoded.sub)
+      await findCustomer(decoded.sub)
 
       await router.push('/tabs/')
     } catch (err) {
@@ -75,9 +75,44 @@ export const useSignIn = () => {
     }
   }
 
+  const forgotPassword = async () => {
+    const loading = await loadingController.create({
+      message: 'Enviando...',
+    });
+    await loading.present();
+
+    try {
+      if (!credentials.value.email) {
+        await Dialog.alert({
+          title: 'Erro ao processar',
+          message: 'Precisamos do seu E-mail para te enviar uma nova senha'
+        });
+
+        return
+      }
+
+      await Api.auth.forgotPassword(credentials.value.email)
+
+      await Dialog.alert({
+        title: 'Sucesso',
+        message: 'Te enviamos uma nova senha'
+      });
+
+    } catch (err) {
+      await Dialog.alert({
+        title: 'Erro ao processar',
+        message:  (err as Error).message ?? 'Não foi possível processar uma nova senha!'
+      });
+    } finally {
+      await loading.dismiss()
+    }
+  }
+
+
   return {
     credentials,
     signIn,
+    forgotPassword,
     v$
   }
 }

@@ -1,6 +1,5 @@
-import { User, UserTypes } from '@/services/api/types';
+import { CustomerUser } from '@/services/api/types';
 import { computed, ref } from 'vue';
-import { Api } from '@/services/api/Api';
 import { store } from '@/store';
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required, sameAs, } from '@vuelidate/validators';
@@ -11,8 +10,7 @@ import { BadRequestError } from '@/services/api/errors/BadRequestError';
 import { DateTime } from 'luxon';
 
 export const useSignUp = () => {
-  const initialUser = {
-    type: UserTypes.Customer,
+  const initialInput = {
     name: '',
     cpf: '',
     birthday: '',
@@ -21,30 +19,32 @@ export const useSignUp = () => {
     passwordConfirmation: '',
   }
 
-  const user = ref(initialUser)
+  const input = ref(initialInput)
 
   const errorsFromRequest = ref({} as Record<string, ValidationError>)
 
 
   const rules = computed(() => ({
-    name: { required },
-    cpf: { required, },
+    name: {     required: helpers.withMessage('Nome é obrigatório', required),
+    },
+    cpf: {     required: helpers.withMessage('CPF é obrigatório', required),
+     },
     birthday: {
       required: helpers.withMessage('Data de nascimento é obrigatória', required)
     },
     email: {
-      required,
-      email
+      required: helpers.withMessage('E-mail é obrigatório', required),
+      email: helpers.withMessage('E-mail precisa ser um e-mail', email),
     },
     password: { required },
     passwordConfirmation: {
-      required,
-      sameAs: sameAs(user.value.password)
+      required: helpers.withMessage('Confirmar senha é obrigatório', required),
+      sameAs:  helpers.withMessage('Confirmar senha precisa coincidir com Senha', sameAs(input.value.password))
     }
   }))
 
 
-  const v$ = useVuelidate(rules, user, { $stopPropagation: true })
+  const v$ = useVuelidate(rules, input, { $stopPropagation: true })
 
   const showLoading = async () => {
     const loading = await loadingController.create({
@@ -67,12 +67,17 @@ export const useSignUp = () => {
         return false;
       }
 
-      const toCreate = { ...user.value, birthday: DateTime.fromISO(user.value.birthday) }
+      const customer: CustomerUser = {
+        ...input.value,
+        birthday: DateTime.fromISO(input.value.birthday).set({
+          hour: 0,
+          minute: 0,
+          second: 0,
+          millisecond: 0
+        }).toJSDate()
+      }
 
-      const created = await Api.users.create(
-        toCreate as any as User
-      )
-      await store.dispatch('saveUser', created)
+      await store.dispatch('createCustomer', customer)
 
       return true
     } catch (err) {
@@ -93,7 +98,7 @@ export const useSignUp = () => {
   }
 
   return {
-    user,
+    user: input,
     createUser,
     v$,
     errorsFromRequest

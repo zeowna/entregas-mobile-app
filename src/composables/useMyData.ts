@@ -4,8 +4,8 @@ import { computed } from 'vue';
 import { store } from '@/store';
 
 export const useMyData = () => {
-  const user = computed(
-    () => store.state.user || {}
+  const customer = computed(
+    () => store.getters.getUser
   )
 
   const signOut = async () => {
@@ -20,7 +20,7 @@ export const useMyData = () => {
   }
 
   return {
-    user,
+    customer,
     signOut
   }
 }

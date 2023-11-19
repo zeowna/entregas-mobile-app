@@ -1,48 +1,22 @@
-import { AppState } from '@/store';
-import { CartProduct, Order, Partner, PartnerProduct, User } from '@/services/api/types';
+import { AppState } from '@/store/index'
+import { User } from '@/services/api/types'
+import { MutationTree } from 'vuex'
 
-const getCartProduct = (cart: CartProduct[]) => (productId: number) => cart.find(({ partnerProduct: { id } }) => id === productId)
+export enum MutationTypes {
+  SET_USER = 'SET_USER',
+  SET_TOKEN = 'SET_TOKEN'
+}
 
-const deleteProductFromCart = (cart: CartProduct[]) => (productId: number) => cart
-  .reduce<CartProduct[]>((acc, cartProduct) => (cartProduct.partnerProduct.id === productId)
-      ? acc
-      : [...acc, cartProduct]
-    , [])
+export type Mutations<S = AppState> = {
+  [MutationTypes.SET_USER](state: S, payload: User): void
+  [MutationTypes.SET_TOKEN](state: S, token: string): void
+}
 
-
-export const mutations = {
-  SAVE_PARTNERS: (state: AppState, partners: Partner[]) => {
-    state.partners = [...state.partners, ...partners]
-  },
-  SAVE_ORDERS: (state: AppState, orders: Order[]) => {
-    state.orders = [...state.orders, ...orders]
-  },
-  SAVE_USER: (state: AppState, user: User) => {
+export const mutations: MutationTree<AppState> & Mutations = {
+  [MutationTypes.SET_USER]: (state, user) => {
     state.user = user
   },
-  ADD_PRODUCT_IN_CART: (state: AppState, partnerProduct: PartnerProduct) => {
-    const found = getCartProduct(state.cart)(partnerProduct.id as number)
-
-    if (found) {
-      found.quantity += 1
-      return;
-    }
-
-    state.cart.push({
-      value: partnerProduct.value,
-      quantity: 1,
-      partnerProduct: partnerProduct
-    })
-  },
-  REMOVE_PRODUCT_FROM_CART: (state: AppState, partnerProduct: PartnerProduct) => {
-    const found = getCartProduct(state.cart)(partnerProduct.id as number)
-
-    if (found?.quantity) {
-      found.quantity -= 1
-
-      if (!found.quantity) {
-        state.cart = deleteProductFromCart(state.cart)(partnerProduct.id as number)
-      }
-    }
+  [MutationTypes.SET_TOKEN]: (state, token) => {
+    state.token = token
   }
 }

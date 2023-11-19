@@ -1,8 +1,8 @@
-import { User } from '@/services/api/types/User'
-import { Entity } from '@/services/api/types/Entity'
-import { CartProduct } from '@/services/api/types/CartProduct'
-import { Partner } from '@/services/api/types/Partner'
-import { Address } from '@/services/api/types/Address'
+import { CustomerUser } from './CustomerUser'
+import { Entity } from './Entity'
+import { CartProduct } from './CartProduct'
+import { Partner } from './Partner'
+import { Address } from './Address'
 
 export enum OrderStatuses {
   Created = 'created',
@@ -13,7 +13,7 @@ export enum OrderStatuses {
 }
 
 export interface Order extends Entity {
-  customer?: User
+  customer?: CustomerUser
   partner: Partner
   cart: CartProduct[]
   address: Address

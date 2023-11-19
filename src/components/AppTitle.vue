@@ -1,6 +1,5 @@
 <template>
-  <ion-icon :icon="flameOutline" class="logo-red"/>
-  Entre<span class="logo-red">Gás</span>
+  Entre<span class="logo-red">gas</span>
 </template>
 
 

@@ -8,44 +8,57 @@
             <app-title/>
           </ion-title>
         </ion-buttons>
-
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
-
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-            Saldanha Distribuidora
+            {{ partner?.name }}
+          </ion-card-title>
+          <ion-card-subtitle>
+            {{ formatAddress(partner?.address) }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <MapContainer :address="partner?.address"/>
+        </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            Lista de produtos
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          <ion-row v-for="{ product, ...partnerProduct} in partnerProducts" :key="partnerProduct.id">
-            <ion-col size="sm">
-              {{ getCartProduct(partnerProduct.id)?.quantity || 0 }}
-            </ion-col>
-            <ion-col size="">
-              <p>{{ product.name }} {{ product.size }}</p>
-              <b>R$ {{ (partnerProduct.value / 100).toFixed(2).replace('.', ',') }}</b>
-            </ion-col>
-            <ion-col size="sm">
-              <ion-button size="small" @click="addProduct({...partnerProduct, product})">
-                <ion-icon slot="icon-only" :icon="addOutline"/>
-              </ion-button>
-              <ion-button size="small" color="danger" @click="removeProduct({...partnerProduct, product})">
-                <ion-icon slot="icon-only" :icon="trash"/>
-              </ion-button>
-            </ion-col>
-          </ion-row>
+          <div v-for="group in Object.keys(groupedPartnerProducts)" :key="group">
+            <ion-row>
+              <ion-col>
+                <h2><b>{{ group }}</b></h2>
+              </ion-col>
+            </ion-row>
+            <ion-row v-for="partnerProduct in groupedPartnerProducts[group]" :key="partnerProduct.id">
+              <ion-col size="sm">
+                {{ getCartProduct(partnerProduct?.id!)?.quantity || 0 }}
+              </ion-col>
+              <ion-col>
+                <p>{{ partnerProduct.product!.name }} {{ partnerProduct.product!.size }}</p>
+                <b>+ R$ {{ (partnerProduct.value / 100).toFixed(2).replace('.', ',') }}</b>
+              </ion-col>
+              <ion-col size="sm">
+                <ion-button size="small" @click="selectProductToShow(partnerProduct)">
+                  <ion-icon slot="icon-only" :icon="cart"/>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </div>
         </ion-card-content>
       </ion-card>
-
-      <cart/>
-
+      <ProductCart show-button/>
+      <ProductDetailsModal :visible="visible" :selectedPartnerProduct="selectedPartnerProduct" @close="close" />
     </ion-content>
-
   </ion-page>
+
 </template>
 
 <script lang="ts" setup>
@@ -60,7 +73,7 @@ import {
   IonCol,
   IonContent,
   IonHeader,
-  IonIcon,
+  IonIcon, IonModal,
   IonPage,
   IonRow,
   IonTitle,
@@ -68,17 +81,38 @@ import {
 } from '@ionic/vue'
 import AppTitle from '@/components/AppTitle.vue';
 import { useRoute } from 'vue-router';
-import { addOutline, trash } from 'ionicons/icons';
+import { addOutline, trash, cart } from 'ionicons/icons';
 import { useCart, usePartner } from '@/composables';
-import Cart from '@/components/Cart.vue';
+import ProductCart from '@/components/ProductCart.vue';
+import { onMounted, ref } from "vue";
+import MapContainer from "@/components/MapContainer.vue";
+import { centsToCurrency, formatAddress } from "@/utils";
+import { PartnerProduct } from "@/services/api/types";
+import ProductDetailsModal from "@/views/ProductDetailsModal.vue";
 
-
+const visible = ref(false)
+const selectedPartnerProduct = ref<PartnerProduct | null>(null)
 const route = useRoute()
-
-
-const { partnerProducts } = usePartner(+route.params.id)
-
 const { getCartProduct, addProduct, removeProduct } = useCart()
+const {
+  partner,
+  groupedPartnerProducts, getProducts, getPartner
+} = usePartner()
+
+const close = () => {
+  visible.value = false
+}
+
+const selectProductToShow = (partnerProduct: PartnerProduct) => {
+  selectedPartnerProduct.value = partnerProduct
+  visible.value = true
+}
+
+onMounted(async () => {
+  await getPartner(+route.params.id)
+  await getProducts(+route.params.id)
+})
+
 
 </script>
 

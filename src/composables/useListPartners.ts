@@ -1,33 +1,66 @@
 import { computed, onMounted, ref } from 'vue';
 import { Api } from '@/services/api/Api';
 import { store } from '@/store';
+import { FindEntitiesPaging, FindEntitiesResponse, Partner, PartnerStatuses } from "@/services/api/types";
+
+const shouldFindMorePartners = ref(false)
+
+const data = ref<FindEntitiesResponse<Partner>>({
+  list: [],
+  count: 0,
+  skip: 0,
+  limit: 0,
+  pages: 0
+})
+const params = ref<FindEntitiesPaging>({
+  conditions: { status: { eq: PartnerStatuses.Active } },
+  skip: 0,
+  limit: 25
+})
+const isLoading = ref(false)
+
+const reset = () => {
+  data.value = {
+    list: [],
+    count: 0,
+    skip: 0,
+    limit: 0,
+    pages: 0
+  }
+
+  params.value = {
+    conditions: { status: { eq: PartnerStatuses.Active } },
+    skip: 0,
+    limit: 25
+  }
+}
+
+const findPartners = async () => {
+  isLoading.value = true
+  const found = await Api.partners.find(params.value)
+
+  data.value.list = [
+    ...data.value.list,
+    ...found.list
+  ]
+  params.value.skip! += params.value.limit!
+
+  shouldFindMorePartners.value = !!found.list.length
+  isLoading.value = false
+}
+
+const ionInfinite = async (ev: Event) => {
+  await findPartners()
+}
 
 export const useListPartners = () => {
-  const shouldFindMorePartners = ref(false)
-  const location = ref('Rua Mato Grosso 293, Curitiba - PR')
-
-  const partners = computed(() => store.state.partners)
-
-  const findPartners = async () => {
-    const partners = await Api.partners.find()
-    await store.dispatch('savePartners', partners)
-    shouldFindMorePartners.value = true
-  }
-
-  const getAddressText = (address: any) => `${address.street}, ${address.number},  ${address.neighbourhood} - ${address.city}`
-
-  const ionInfinite = async (ev: Event) => {
-    await findPartners()
-    setTimeout(() => (ev.target as any).complete(), 2000);
-  }
-
-  onMounted(async () => findPartners())
-
   return {
     shouldFindMorePartners,
     location,
-    partners,
-    getAddressText,
+    params,
+    data,
+    reset,
+    findPartners,
     ionInfinite
   }
 }

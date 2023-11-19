@@ -1,7 +1,8 @@
 <template>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Valor Total</ion-card-title>
+      <ion-card-title>Carrinho de compras</ion-card-title>
+      <ion-card-subtitle>Listagem de produtos</ion-card-subtitle>
     </ion-card-header>
     <ion-card-content>
 
@@ -11,11 +12,11 @@
 
       <br/>
 
-      <h1>R$ {{ (sumCartValue() / 100).toFixed(2).replace('.', ',') }}</h1>
+      <h1>{{ centsToCurrency(sumCartValue()) }}</h1>
 
       <br/>
 
-      <ion-button expand="block">Comprar</ion-button>
+      <ion-button v-if="showButton" expand="block">Fechar compra</ion-button>
     </ion-card-content>
   </ion-card>
 </template>
@@ -23,6 +24,11 @@
 <script lang="ts" setup>
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle } from '@ionic/vue';
 import { useCart } from '@/composables';
+import { centsToCurrency } from "@/utils";
+
+defineProps({ showButton: { type: Boolean, default: false }})
 
 const { cart, sumCartValue } = useCart()
+
+
 </script>

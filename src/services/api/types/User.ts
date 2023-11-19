@@ -1,5 +1,4 @@
-import { Entity } from '@/services/api/types/Entity';
-import { Address } from '@/services/api/types/Address';
+import { Entity } from './Entity'
 
 export enum UserTypes {
   Admin = 'admin',
@@ -9,11 +8,10 @@ export enum UserTypes {
 
 export interface User extends Entity {
   name: string
-  birthday: string | Date
+  birthday: Date | string | null
   cpf: string
   email: string
-  type: UserTypes
-  profilePictureURI?: string
-  addresses?: Address[]
   password?: string
+  profilePictureURI?: string
+  readonly type?: UserTypes | null
 }

@@ -29,27 +29,24 @@
           <ion-row>
             <ion-col size="sm">
               <ion-avatar class="ion-text-center">
-                <ion-img :src="user?.profilePictureURI || avatarPlaceholderURI"/>
+                <ion-img :src="customer?.profilePictureURI || avatarPlaceholderURI"/>
               </ion-avatar>
             </ion-col>
             <ion-col size="auto" class="personal-data">
-              <p><b>{{ user?.name }}</b></p>
-              <p>{{ user?.email }}</p>
+              <p><b>{{ customer?.name }}</b></p>
+              <p>{{ customer?.email }}</p>
             </ion-col>
           </ion-row>
 
           <br/>
-          <ion-button expand="block" type="button" id="open-edit-my-data-modal">
+          <ion-button expand="block" type="button" @click="openEditMyDataModal">
             <ion-icon :icon="personCircle" slot="start"/>
             Editar
           </ion-button>
-
-          <EditMyDataModal trigger="open-edit-my-data-modal"/>
         </ion-card-content>
       </ion-card>
 
       <ion-list>
-
         <ion-item @click="signOut">
           <ion-label>
             Sair do App
@@ -57,7 +54,7 @@
           <ion-icon aria-hidden="true" :icon="exitOutline"/>
         </ion-item>
       </ion-list>
-
+      <EditMyDataModal :visible="visible" @close="close"/>
     </ion-content>
   </ion-page>
 </template>
@@ -90,9 +87,18 @@ import { useMyData } from '@/composables';
 import { ref } from 'vue';
 import EditMyDataModal from '@/views/EditMyDataModal.vue';
 
-const { user, signOut } = useMyData()
+const { customer, signOut } = useMyData()
+const visible = ref(false)
 
 const avatarPlaceholderURI = ref('https://ionicframework.com/docs/img/demos/avatar.svg')
+
+const openEditMyDataModal = () => {
+  visible.value = true
+}
+
+const close = () => {
+  visible.value = false
+}
 
 </script>
 

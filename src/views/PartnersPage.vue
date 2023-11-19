@@ -9,6 +9,9 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">
@@ -26,9 +29,9 @@
         </ion-col>
       </ion-row>
 
-      <ion-card v-for="partner in partners" :key="partner.id" @click="goToPartner(partner.id)">
+      <ion-card v-for="partner in data.list" :key="partner.id" @click="goToPartner(partner.id)">
         <ion-card-header>
-          <ion-card-subtitle>{{ getAddressText(partner.address) }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ formatAddress(partner.address) }}</ion-card-subtitle>
           <ion-card-title>{{ partner.name }}</ion-card-title>
         </ion-card-header>
         <ion-card-content>
@@ -70,18 +73,44 @@ import AppTitle from "@/components/AppTitle.vue";
 import { locationOutline } from "ionicons/icons";
 import { useListPartners } from '@/composables';
 import router from '@/router';
+import { onMounted, onUnmounted, ref } from "vue";
+import { formatAddress } from "../utils";
 
 const {
   shouldFindMorePartners,
-  location,
-  partners,
-  getAddressText,
+  data,
+  reset,
+  findPartners,
   ionInfinite
 } = useListPartners()
 
-const goToPartner = (partnerId: number) => {
-  router.push(`/tabs/partnerListTab/partner/${partnerId}`)
+const location = ref('')
+
+const goToPartner = async (partnerId: number) => {
+  await router.push(`/tabs/partnerListTab/partner/${partnerId}`)
 }
+
+const handleRefresh = (event: CustomEvent) => {
+  setTimeout(async () => {
+    reset()
+
+    await findPartners()
+    // Any calls to load data go here
+    event?.target?.complete();
+  }, 2000);
+};
+
+onMounted(async () => {
+  reset()
+  await findPartners()
+})
+
+onUnmounted(() => {
+  reset()
+})
+
+
+
 </script>
 
 <style scoped>
