@@ -2,16 +2,16 @@
   <ion-page>
     <ion-content>
       <form @submit.prevent="signIn">
-        <ion-card class="sign-card">
-          <ion-card-content>
-            <ion-row>
-              <ion-col class="ion-text-center">
-                <h1>
-                  <AppTitle/>
-                </h1>
-              </ion-col>
-            </ion-row>
+        <ion-row class="sign-card">
+          <ion-col class="ion-text-center">
+            <h1>
+              <AppTitle/>
+            </h1>
+          </ion-col>
+        </ion-row>
 
+        <ion-card >
+          <ion-card-content>
             <ion-input v-model="credentials.email" placeholder="E-mail"/>
             <input-error :prop="v$.email"/>
 
@@ -32,26 +32,26 @@
         </ion-card>
       </form>
 
-      <ion-row>
-        <ion-col class="ion-text-right">
-          <ion-button color="facebook">
-            <ion-icon :icon="logoFacebook" slot="start"/>
-            Facebook
-          </ion-button>
-        </ion-col>
-        <ion-col>
-          <ion-button color="gmail">
-            <ion-icon :icon="logoGoogle" slot="start"/>
-            Gmail
-          </ion-button>
-        </ion-col>
-      </ion-row>
+      <!--      <ion-row>-->
+      <!--        <ion-col class="ion-text-right">-->
+      <!--          <ion-button color="facebook">-->
+      <!--            <ion-icon :icon="logoFacebook" slot="start"/>-->
+      <!--            Facebook-->
+      <!--          </ion-button>-->
+      <!--        </ion-col>-->
+      <!--        <ion-col>-->
+      <!--          <ion-button color="gmail">-->
+      <!--            <ion-icon :icon="logoGoogle" slot="start"/>-->
+      <!--            Gmail-->
+      <!--          </ion-button>-->
+      <!--        </ion-col>-->
+      <!--      </ion-row>-->
 
       <br/>
 
       <ion-row>
         <ion-col class="ion-text-center">
-          <a @click="openSignUpModal">Criar conta com E-mail</a>
+          <a @click="openSignUpModal">Criar conta com e-mail</a>
         </ion-col>
       </ion-row>
 
@@ -61,8 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import { IonButton, IonCard, IonCardContent, IonCol, IonContent, IonIcon, IonInput, IonPage, IonRow } from '@ionic/vue'
-import { logoFacebook, logoGoogle } from 'ionicons/icons';
+import { IonButton, IonCard, IonCardContent, IonCol, IonContent, IonInput, IonPage, IonRow } from '@ionic/vue'
 import AppTitle from '@/components/AppTitle.vue';
 import { useSignIn } from '@/composables';
 import SignUpModal from '@/views/SignUpModal.vue';

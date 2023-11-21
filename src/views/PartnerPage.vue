@@ -2,12 +2,12 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-buttons>
+        <ion-buttons slot="start">
           <ion-back-button text=""/>
-          <ion-title>
-            <app-title/>
-          </ion-title>
         </ion-buttons>
+        <ion-title>
+          <AppTitle/>
+        </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -31,6 +31,15 @@
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
+          <ion-row>
+            <ion-col class="search-col" size="sm">
+              <ion-icon :icon="search"/>
+            </ion-col>
+            <ion-col>
+              <ion-input v-model="productName" placeholder="Buscar por nome" @keyup="filterByProductName"/>
+            </ion-col>
+          </ion-row>
+
           <div v-for="group in Object.keys(groupedPartnerProducts)" :key="group">
             <ion-row>
               <ion-col>
@@ -47,15 +56,17 @@
               </ion-col>
               <ion-col size="sm">
                 <ion-button size="small" @click="selectProductToShow(partnerProduct)">
-                  <ion-icon slot="icon-only" :icon="cart"/>
+                  Ver
                 </ion-button>
               </ion-col>
             </ion-row>
           </div>
+          <br />
+          <ion-button expand="block" @click="toggleCart">Ir para carrinho de compras</ion-button>
         </ion-card-content>
       </ion-card>
-      <ProductCart show-button/>
-      <ProductDetailsModal :visible="visible" :selectedPartnerProduct="selectedPartnerProduct" @close="close" />
+      <ProductDetailsModal :visible="productDetailsVisible" :selectedPartnerProduct="selectedPartnerProduct" @close="toggleProductDetails"/>
+      <ProductCartModal :visible="cartVisible" @close="toggleCart"/>
     </ion-content>
   </ion-page>
 
@@ -69,54 +80,75 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
+  IonCardSubtitle,
   IonCardTitle,
   IonCol,
   IonContent,
   IonHeader,
-  IonIcon, IonModal,
+  IonIcon,
+  IonInput,
   IonPage,
   IonRow,
   IonTitle,
-  IonToolbar
+  IonToolbar,
+  loadingController
 } from '@ionic/vue'
 import AppTitle from '@/components/AppTitle.vue';
 import { useRoute } from 'vue-router';
-import { addOutline, trash, cart } from 'ionicons/icons';
+import { search } from 'ionicons/icons';
 import { useCart, usePartner } from '@/composables';
-import ProductCart from '@/components/ProductCart.vue';
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import MapContainer from "@/components/MapContainer.vue";
-import { centsToCurrency, formatAddress } from "@/utils";
+import { formatAddress } from "@/utils";
 import { PartnerProduct } from "@/services/api/types";
 import ProductDetailsModal from "@/views/ProductDetailsModal.vue";
+import ProductCartModal from "@/views/ProductCartModal.vue";
 
-const visible = ref(false)
+const productDetailsVisible = ref(false)
 const selectedPartnerProduct = ref<PartnerProduct | null>(null)
 const route = useRoute()
-const { getCartProduct, addProduct, removeProduct } = useCart()
+const { cartVisible, toggleCart, getCartProduct } = useCart()
 const {
   partner,
-  groupedPartnerProducts, getProducts, getPartner
+  productName,
+  groupedPartnerProducts, getProducts, getPartner, filterByProductName, reset
 } = usePartner()
 
-const close = () => {
-  visible.value = false
+const toggleProductDetails = () => {
+  productDetailsVisible.value = !productDetailsVisible.value
 }
+
 
 const selectProductToShow = (partnerProduct: PartnerProduct) => {
   selectedPartnerProduct.value = partnerProduct
-  visible.value = true
+  toggleProductDetails()
 }
 
 onMounted(async () => {
+  reset()
+  const loading = await loadingController.create({
+    message: 'Carregando...',
+  });
+  await loading.present()
+
   await getPartner(+route.params.id)
   await getProducts(+route.params.id)
+
+  await loading.dismiss()
 })
 
-
+onUnmounted(() => {
+  reset()
+})
 </script>
 
-
 <style scoped>
+.md > .search-col {
+  padding-top: 6%;
+}
+
+.ios > .search-col {
+  padding-top: 5%;
+}
 
 </style>

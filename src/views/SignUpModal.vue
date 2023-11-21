@@ -5,6 +5,9 @@
         <ion-buttons slot="start">
           <ion-button @click="close">Voltar</ion-button>
         </ion-buttons>
+        <ion-title>
+          <AppTitle/>
+        </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -12,7 +15,7 @@
         <ion-card>
           <ion-card-header>
             <ion-card-title>
-              <AppTitle/>
+              Cadastro
             </ion-card-title>
           </ion-card-header>
 
@@ -89,6 +92,7 @@ import {
   IonInput,
   IonLabel,
   IonModal,
+  IonTitle,
   IonToolbar
 } from '@ionic/vue'
 import { computed, ref } from 'vue';

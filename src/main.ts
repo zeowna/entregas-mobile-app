@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+import { VMask } from 'ionic-vue-input-mask'
 
 import { IonicVue } from '@ionic/vue';
 
@@ -25,8 +26,10 @@ import './theme/variables.css';
 
 const app = createApp(App)
   .use(IonicVue)
-  .use(router);
-  
+  .use(router)
+
+app.directive('mask', VMask)
+
 router.isReady().then(() => {
   app.mount('#app');
 });

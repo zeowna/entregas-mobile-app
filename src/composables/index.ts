@@ -1,3 +1,4 @@
+export * from "@/composables/useAddress";
 export * from '@/composables/useCart';
 export * from '@/composables/useSignUp';
 export * from '@/composables/useListOrders';

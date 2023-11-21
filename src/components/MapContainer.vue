@@ -39,7 +39,7 @@ const buildMap = async (address: Address) => {
     gestureHandling: 'none'
   }
 
-  const map = new Map(document.getElementById('map'), mapOptions)
+  const map = new Map(document.getElementById('map') as HTMLElement, mapOptions)
 
   new google.maps.Marker({
     position: map.getCenter(),

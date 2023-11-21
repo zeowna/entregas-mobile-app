@@ -8,107 +8,102 @@ import router from '@/router';
 import { Dialog } from '@capacitor/dialog';
 import { loadingController } from '@ionic/vue';
 
+const credentials = ref({
+  email: '',
+  password: ''
+})
 
-export const useSignIn = () => {
-  const credentials = ref({
-    email: '',
-    password: ''
-  })
+const rules = computed(() => ({
+  email: {
+    required: helpers.withMessage('E-mai é obrigatório', required),
+    email: helpers.withMessage('E-mail precisa ser um e-mail', email),
+  },
+  password: {
+    required: helpers.withMessage('Senha é obrigatório', required)
+  }
+}))
 
-  const rules = computed(() => ({
-    email: {
-      required: helpers.withMessage('E-mai é obrigatório', required),
-      email: helpers.withMessage('E-mail precisa ser um e-mail', email),
-    },
-    password: {
-      required: helpers.withMessage('Preencha sua Senha', required)
+const v$ = useVuelidate(rules, credentials)
+
+const showLoading = async () => {
+  const loading = await loadingController.create({
+    message: 'Entrando...',
+  });
+  await loading.present();
+
+  return loading;
+};
+
+const authUser = async () => {
+  const { authorization_token } = await Api.auth.signIn(credentials.value.email, credentials.value.password)
+
+  localStorage.setItem('token', authorization_token)
+
+  return jwtDecode(authorization_token) as any
+}
+
+
+const signIn = async () => {
+  const loading = await showLoading()
+
+  try {
+    const result = await v$.value.$validate()
+
+    if (!result) {
+      throw new Error(v$.value.$errors.map((e) => e.$message).join())
     }
-  }))
 
-  const v$ = useVuelidate(rules, credentials, { $stopPropagation: true })
+    await authUser()
 
-  const showLoading = async () => {
-    const loading = await loadingController.create({
-      message: 'Entrando...',
+    await router.push('/tabs/')
+  } catch (err) {
+    console.log(err)
+
+    await Dialog.alert({
+      title: 'Erro ao entrar',
+      message: err instanceof Error
+        ? err.message
+        : err as string,
     });
-    await loading.present();
-
-    return loading;
-  };
-
-  const authUser = async () => {
-    const { authorization_token } = await Api.auth.signIn(credentials.value.email, credentials.value.password)
-
-    localStorage.setItem('token', authorization_token)
-
-    return jwtDecode(authorization_token) as any
+  } finally {
+    await loading.dismiss()
   }
+}
 
-  const findCustomer = async (id: number) => {
-    const user = await Api.customers.findById(id)
-    await store.dispatch('saveCustomer', user)
-  }
+const forgotPassword = async () => {
+  const loading = await loadingController.create({
+    message: 'Enviando...',
+  });
+  await loading.present();
 
-  const signIn = async () => {
-    const loading = await showLoading()
-
-    try {
-      const result = await v$.value.$validate()
-
-      if (!result) {
-        return;
-      }
-
-      const decoded = await authUser();
-      await findCustomer(decoded.sub)
-
-      await router.push('/tabs/')
-    } catch (err) {
-      await Dialog.alert({
-        title: 'Erro ao entrar',
-        message: err instanceof Error
-          ? err.message
-          : err as string,
-      });
-    } finally {
-      await loading.dismiss()
-    }
-  }
-
-  const forgotPassword = async () => {
-    const loading = await loadingController.create({
-      message: 'Enviando...',
-    });
-    await loading.present();
-
-    try {
-      if (!credentials.value.email) {
-        await Dialog.alert({
-          title: 'Erro ao processar',
-          message: 'Precisamos do seu E-mail para te enviar uma nova senha'
-        });
-
-        return
-      }
-
-      await Api.auth.forgotPassword(credentials.value.email)
-
-      await Dialog.alert({
-        title: 'Sucesso',
-        message: 'Te enviamos uma nova senha'
-      });
-
-    } catch (err) {
+  try {
+    if (!credentials.value.email) {
       await Dialog.alert({
         title: 'Erro ao processar',
-        message:  (err as Error).message ?? 'Não foi possível processar uma nova senha!'
+        message: 'Precisamos do seu E-mail para te enviar uma nova senha'
       });
-    } finally {
-      await loading.dismiss()
+
+      return
     }
+
+    await Api.auth.forgotPassword(credentials.value.email)
+
+    await Dialog.alert({
+      title: 'Sucesso',
+      message: 'Te enviamos uma nova senha'
+    });
+
+  } catch (err) {
+    await Dialog.alert({
+      title: 'Erro ao processar',
+      message:  (err as Error).message ?? 'Não foi possível processar uma nova senha!'
+    });
+  } finally {
+    await loading.dismiss()
   }
+}
 
-
+export const useSignIn = () => {
   return {
     credentials,
     signIn,

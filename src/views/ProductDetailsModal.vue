@@ -1,19 +1,14 @@
 <template>
   <ion-modal :isOpen="visible">
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button @click="close">Voltar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
     <ion-content>
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-            {{ selectedPartnerProduct?.product?.name }} {{ selectedPartnerProduct?.product?.size }}
+            <AppTitle/>
+            <h4> {{ selectedPartnerProduct?.product?.name }} {{ selectedPartnerProduct?.product?.size }}</h4>
           </ion-card-title>
-          <ion-card-subtitle>Adicione a quantidade que deseja comprar</ion-card-subtitle>
+          <ion-card-subtitle>{{ centsToCurrency(selectedPartnerProduct.value) }} por unidade
+          </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
           <ion-row>
@@ -27,10 +22,10 @@
 
           <ion-row>
             <ion-col class="ion-text-center">
-              <h1> Quantidade: {{
+              <h2> Quantidade: {{
                   getCartProduct(selectedPartnerProduct?.id!)?.quantity || 0
-                }}</h1>
-              <h2> + {{ centsToCurrency(getCartProduct(selectedPartnerProduct?.id!)?.totalValue) }}</h2>
+                }}</h2>
+              <h3 v-if="!getCartProduct(selectedPartnerProduct?.id!)?.quantity">Adicione a quantidade desejada</h3>
             </ion-col>
           </ion-row>
           <ion-row>
@@ -45,12 +40,19 @@
               </ion-button>
             </ion-col>
           </ion-row>
+
+          <ion-row>
+            <ion-col class="ion-text-center">
+              <h2 v-if="getCartProduct(selectedPartnerProduct?.id!)?.quantity > 0">{{ centsToCurrency(getCartProduct(selectedPartnerProduct?.id!)?.totalValue) }}</h2>
+            </ion-col>
+          </ion-row>
+
+          <br/>
+
+          <ion-button expand="block" @click="close">Confirmar seleção</ion-button>
+
         </ion-card-content>
       </ion-card>
-      <ProductCart/>
-      <br/>
-      <br/>
-      <br/>
     </ion-content>
   </ion-modal>
 
@@ -61,23 +63,21 @@ import { addOutline, removeOutline } from "ionicons/icons";
 import { centsToCurrency } from "@/utils";
 import {
   IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
+  IonCardSubtitle,
   IonCardTitle,
   IonCol,
   IonContent,
-  IonHeader,
   IonIcon,
   IonModal,
-  IonRow,
-  IonToolbar
+  IonRow
 } from "@ionic/vue";
-import ProductCart from "@/components/ProductCart.vue";
 import { PropType } from "vue";
 import { PartnerProduct } from "@/services/api/types";
 import { useCart } from "@/composables";
+import AppTitle from "@/components/AppTitle.vue";
 
 const { getCartProduct, addProduct, removeProduct } = useCart()
 

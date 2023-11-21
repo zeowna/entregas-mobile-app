@@ -3,6 +3,15 @@ import { CartProduct, PartnerProduct } from '@/services/api/types';
 import { store } from '@/store';
 
 const cart = ref<CartProduct[]>([])
+const cartVisible = ref(false)
+
+const toggleCart = () => {
+  cartVisible.value = !cartVisible.value
+}
+
+const reset = () => {
+  cart.value = []
+}
 
 const deleteProductFromCart = (productId: number) => cart.value
   .reduce<CartProduct[]>((acc, cartProduct) => (cartProduct.partnerProduct.id === productId)
@@ -45,9 +54,12 @@ const sumCartValue = () => cart.value.reduce((acc, { quantity, value }) => acc +
 export const useCart = () => {
   return {
     cart,
+    cartVisible,
+    reset,
     getCartProduct,
     addProduct,
     removeProduct,
-    sumCartValue
+    sumCartValue,
+    toggleCart
   }
 }
