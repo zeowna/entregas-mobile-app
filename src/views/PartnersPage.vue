@@ -1,12 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>
-          <AppTitle/>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader/>
 
     <ion-content :fullscreen="true">
       <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)" v-if="selectedAddress && addresses.length">
@@ -20,7 +14,7 @@
         </ion-toolbar>
       </ion-header>
 
-      <CustomerAddressSelectionCard  v-if="addresses.length" />
+      <CustomerAddressSelectionCard v-if="addresses?.length"/>
 
       <ion-card v-if="!selectedAddress || !addresses.length">
         <ion-card-header>
@@ -32,7 +26,7 @@
           </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <ion-img src="/public/img/address-pin.svg" style="fill: red"/>
+          <ion-img src="/img/address-pin.svg" style="fill: red"/>
 
           <ion-button expand="block" @click="toggleAddressesModal">
             <ion-icon :icon="locationOutline"/>
@@ -44,8 +38,13 @@
       <div v-if="selectedAddress && addresses.length">
         <ion-card v-for="partner in data.list" :key="partner.id" @click="goToPartner(partner.id as number)">
           <ion-card-header>
-            <ion-card-subtitle>{{ formatAddress(partner.address) }}</ion-card-subtitle>
             <ion-card-title>{{ partner.name }}</ion-card-title>
+
+            <ion-card-subtitle>
+              {{ formatAddress(partner.address) }} <br />
+              {{ getDistance(selectedAddress, partner.address) }}
+
+            </ion-card-subtitle>
           </ion-card-header>
           <ion-card-content>
             <ion-img v-show="partner.pictureURI" class="partner-img" :src="partner.pictureURI as string"/>
@@ -58,42 +57,39 @@
       <ion-infinite-scroll @ionInfinite="ionInfinite" :disabled="!shouldFindMorePartners">
         <ion-infinite-scroll-content loadingText="Aguarde..." loadingSpinner="circles"></ion-infinite-scroll-content>
       </ion-infinite-scroll>
-      <CustomerAddressesModal :visible="addressesVisible" @close="toggleAddressesModal"/>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts" setup>
 import {
+  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonCol,
   IonContent,
   IonHeader,
   IonIcon,
   IonImg,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonInput,
   IonPage,
   IonRefresher,
   IonRefresherContent,
-  IonRow,
   IonTitle,
   IonToolbar,
-  IonButton, loadingController,
+  loadingController,
 } from '@ionic/vue'
 import AppTitle from "@/components/AppTitle.vue";
-import { locationOutline } from "ionicons/icons";
+import { add, locationOutline, pin } from "ionicons/icons";
 import { useAddress, useListPartners } from '@/composables';
 import router from '@/router';
-import { onMounted, onUnmounted, ref } from "vue";
-import { formatAddress, formatAddressSmall } from "../utils";
-import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
+import { onMounted, onUnmounted } from "vue";
+import { formatAddress, formatAddressSmall, getDistance } from "../utils";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
+import AppHeader from "@/components/AppHeader.vue";
 
 const {
   shouldFindMorePartners,
@@ -103,7 +99,7 @@ const {
   ionInfinite
 } = useListPartners()
 
-const { selectedAddress, addresses, addressesVisible, toggleAddressesModal } = useAddress()
+const { selectedAddress, addresses, toggleAddressesModal } = useAddress()
 
 const goToPartner = async (partnerId: number) => {
   await router.push(`/tabs/partnerListTab/partner/${partnerId}`)

@@ -8,6 +8,7 @@ import { Dialog } from '@capacitor/dialog';
 import { ValidationError } from '@/services/api/errors';
 import { BadRequestError } from '@/services/api/errors/BadRequestError';
 import { DateTime } from 'luxon';
+import { Api } from "@/services/api/Api";
 
 export const useSignUp = () => {
   const initialInput = {
@@ -77,13 +78,15 @@ export const useSignUp = () => {
         }).toJSDate()
       }
 
-      await store.dispatch('createCustomer', customer)
+      await Api.customers.create(customer)
 
       return true
-    } catch (err) {
+    } catch (err: any) {
+      console.error(err)
+
       await Dialog.alert({
         title: 'Erro!',
-        message: "Erro ao Criar Conta"
+        message: err.message ?? "Erro ao Criar Conta"
       });
 
       if (err instanceof BadRequestError) {

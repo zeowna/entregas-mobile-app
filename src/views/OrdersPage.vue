@@ -1,12 +1,7 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>
-          <app-title/>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader />
+
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
@@ -66,27 +61,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonChip,
-  IonCol,
-  IonContent,
-  IonHeader,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonPage,
-  IonRow,
-  IonTitle,
-  IonToolbar
-} from '@ionic/vue';
-import AppTitle from "@/components/AppTitle.vue";
-import { useListOrders } from '@/composables';
-import MapContainer from '@/components/MapContainer.vue';
-
+import { useListOrders } from "@/composables";
+import AppHeader from "@/components/AppHeader.vue";
 
 const {
   orders,
@@ -95,7 +71,6 @@ const {
   shouldFindMorePartners,
   ionInfinite
 } = useListOrders()
-
 
 </script>
 

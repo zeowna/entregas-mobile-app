@@ -5,6 +5,9 @@
         <ion-buttons slot="start">
           <ion-button @click="close">Voltar</ion-button>
         </ion-buttons>
+        <ion-title>
+          <AppTitle/>
+        </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -76,6 +79,7 @@ import { CustomerUser } from "@/services/api/types";
 import { email, helpers, required, sameAs } from "@vuelidate/validators";
 import useVuelidate from "@vuelidate/core";
 import InputError from "@/components/InputError.vue";
+import AppTitle from "@/components/AppTitle.vue";
 
 const emit = defineEmits(['close'])
 defineProps({

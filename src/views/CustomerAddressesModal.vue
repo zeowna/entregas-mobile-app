@@ -17,18 +17,21 @@
             Meus Endereços
           </ion-card-title>
           <ion-card-subtitle>
-            Selecione ou adicione um endereço para entrega
+            <ion-icon :icon="locationOutline"/>
+            {{ formatAddressSmall(selectedAddress) }}
           </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
+
+          <h2>Selecione ou adicione um endereço para entrega</h2>
+
           <ion-list v-if="!showForm">
-            <ion-radio-group v-model="selectedAddress">
               <div v-for="address in addresses" :key="address.id">
                 <ion-item-sliding>
-                  <ion-item @click="close">
-                    <ion-radio label-placement="start" :value="address">
-                      {{ formatAddress(address) }}
-                    </ion-radio>
+                  <ion-item @click="assignSelectedAddress(address)">
+                    <ion-icon aria-hidden="true" slot="end" :icon="caretForwardOutline" />
+
+                    {{ formatAddress(address) }}
                   </ion-item>
                   <ion-item-options side="end">
                     <ion-item-option color="danger" @click="removeAddress(address.id as number)">
@@ -37,7 +40,6 @@
                   </ion-item-options>
                 </ion-item-sliding>
               </div>
-            </ion-radio-group>
           </ion-list>
           <br/>
 
@@ -94,7 +96,7 @@
 
 <script lang="ts" setup>
 import {
-  IonTitle,
+  alertController,
   IonButton,
   IonButtons,
   IonCard,
@@ -114,17 +116,18 @@ import {
   IonLabel,
   IonList,
   IonModal,
-  IonRadio,
-  IonRadioGroup,
   IonRow,
+  IonTitle,
   IonToolbar
 } from '@ionic/vue';
-import { useAddress } from '@/composables';
-import { formatAddress } from "@/utils";
+import { useAddress, useCart } from '@/composables';
+import { formatAddress, formatAddressSmall } from "@/utils";
 import AppTitle from "@/components/AppTitle.vue";
 import { onMounted, onUnmounted } from "vue";
-import { addOutline, trash } from "ionicons/icons";
+import { addOutline, caretForwardOutline, locationOutline, trash } from "ionicons/icons";
 import InputError from "@/components/InputError.vue";
+import { Address } from "@/services/api/types";
+import { useRouter } from "vue-router";
 
 const emit = defineEmits(['close'])
 
@@ -148,6 +151,42 @@ const {
   removeAddress
 } = useAddress()
 
+const { cart, reset: resetCart } = useCart()
+const router = useRouter()
+
+const assignSelectedAddress = async (newAddress: Address) => {
+  if(cart.value.length && newAddress?.id !== selectedAddress.value?.id) {
+    const alert = await alertController.create({
+      header: 'Deseja mudar o endereço para entrega?',
+      message: 'Seu carrinho de compras será descartado',
+      buttons: [
+        {
+          text: 'Trocar endereço',
+          handler:async  () => {
+            resetCart()
+            selectedAddress.value = newAddress
+            emit('close')
+            await router.push('/tabs')
+          }
+        },
+        {
+          text: 'Manter endereço',
+          role: "cancel",
+          handler: () => {
+            emit('close')
+          }
+        }
+      ]
+    })
+
+    await alert.present()
+    return
+  }
+
+  selectedAddress.value = newAddress
+  emit('close')
+}
+
 const close = () => {
   emit('close')
 }
@@ -155,7 +194,7 @@ const close = () => {
 const submitAddress = async () => {
   await createAddress()
   toggleForm()
-  close()
+  await close()
 }
 
 onMounted(() => {

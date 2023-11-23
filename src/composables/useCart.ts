@@ -1,7 +1,7 @@
-import { computed, ref } from 'vue';
-import { CartProduct, PartnerProduct } from '@/services/api/types';
-import { store } from '@/store';
+import { ref } from 'vue';
+import { CartProduct, Partner, PartnerProduct } from '@/services/api/types';
 
+const partner = ref<Partner | null>(null)
 const cart = ref<CartProduct[]>([])
 const cartVisible = ref(false)
 
@@ -10,6 +10,7 @@ const toggleCart = () => {
 }
 
 const reset = () => {
+  partner.value = null
   cart.value = []
 }
 
@@ -21,7 +22,8 @@ const deleteProductFromCart = (productId: number) => cart.value
 
 const getCartProduct = (productId: number) => cart.value.find(({ partnerProduct: { id } }) => id === productId)
 const addProduct = async (partnerProduct: PartnerProduct) => {
-  const found = getCartProduct(partnerProduct.id!)
+  const found = getCartProduct(partnerProduct.id as number)
+  partner.value = partnerProduct.partner as Partner
 
   if (found) {
     found.quantity += 1
@@ -33,6 +35,7 @@ const addProduct = async (partnerProduct: PartnerProduct) => {
     value: partnerProduct.value,
     quantity: 1,
     partnerProduct: partnerProduct,
+    partnerProductId: partnerProduct.id as number,
     totalValue: partnerProduct.value,
   })
 }
@@ -54,6 +57,7 @@ const sumCartValue = () => cart.value.reduce((acc, { quantity, value }) => acc +
 export const useCart = () => {
   return {
     cart,
+    partner,
     cartVisible,
     reset,
     getCartProduct,

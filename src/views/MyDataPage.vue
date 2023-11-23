@@ -1,13 +1,6 @@
 <template>
   <ion-page>
-
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>
-          <app-title/>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader />
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
@@ -86,6 +79,7 @@ import AppTitle from "@/components/AppTitle.vue";
 import { useMyData } from '@/composables';
 import { ref } from 'vue';
 import EditMyDataModal from '@/views/EditMyDataModal.vue';
+import AppHeader from "@/components/AppHeader.vue";
 
 const { customer, signOut } = useMyData()
 const visible = ref(false)

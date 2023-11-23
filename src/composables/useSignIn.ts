@@ -7,6 +7,7 @@ import { email, helpers, required } from '@vuelidate/validators'
 import router from '@/router';
 import { Dialog } from '@capacitor/dialog';
 import { loadingController } from '@ionic/vue';
+import { ActionTypes } from "@/store/actions";
 
 const credentials = ref({
   email: '',
@@ -34,15 +35,6 @@ const showLoading = async () => {
   return loading;
 };
 
-const authUser = async () => {
-  const { authorization_token } = await Api.auth.signIn(credentials.value.email, credentials.value.password)
-
-  localStorage.setItem('token', authorization_token)
-
-  return jwtDecode(authorization_token) as any
-}
-
-
 const signIn = async () => {
   const loading = await showLoading()
 
@@ -53,7 +45,7 @@ const signIn = async () => {
       throw new Error(v$.value.$errors.map((e) => e.$message).join())
     }
 
-    await authUser()
+    await store.dispatch(ActionTypes.SIGN_IN, credentials.value)
 
     await router.push('/tabs/')
   } catch (err) {

@@ -1,16 +1,11 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button text=""/>
-        </ion-buttons>
-        <ion-title>
-          <AppTitle/>
-        </ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <AppHeader />
+
     <ion-content>
+      <CustomerAddressSelectionCard />
+
+
       <ion-card>
         <ion-card-header>
           <ion-card-title>
@@ -36,7 +31,7 @@
               <ion-icon :icon="search"/>
             </ion-col>
             <ion-col>
-              <ion-input v-model="productName" placeholder="Buscar por nome" @keyup="filterByProductName"/>
+              <ion-input v-model="productName" clear-input clear-on-edit placeholder="Buscar por nome" />
             </ion-col>
           </ion-row>
 
@@ -61,12 +56,12 @@
               </ion-col>
             </ion-row>
           </div>
-          <br />
+          <br/>
           <ion-button expand="block" @click="toggleCart">Ir para carrinho de compras</ion-button>
         </ion-card-content>
       </ion-card>
-      <ProductDetailsModal :visible="productDetailsVisible" :selectedPartnerProduct="selectedPartnerProduct" @close="toggleProductDetails"/>
-      <ProductCartModal :visible="cartVisible" @close="toggleCart"/>
+      <ProductDetailsModal :visible="productDetailsVisible" :selectedPartnerProduct="selectedPartnerProduct"
+                           @close="toggleProductDetails"/>
     </ion-content>
   </ion-page>
 
@@ -74,9 +69,7 @@
 
 <script lang="ts" setup>
 import {
-  IonBackButton,
   IonButton,
-  IonButtons,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -84,30 +77,28 @@ import {
   IonCardTitle,
   IonCol,
   IonContent,
-  IonHeader,
   IonIcon,
   IonInput,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
   loadingController
 } from '@ionic/vue'
-import AppTitle from '@/components/AppTitle.vue';
 import { useRoute } from 'vue-router';
 import { search } from 'ionicons/icons';
 import { useCart, usePartner } from '@/composables';
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import MapContainer from "@/components/MapContainer.vue";
 import { formatAddress } from "@/utils";
 import { PartnerProduct } from "@/services/api/types";
 import ProductDetailsModal from "@/views/ProductDetailsModal.vue";
 import ProductCartModal from "@/views/ProductCartModal.vue";
+import AppHeader from "@/components/AppHeader.vue";
+import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 
 const productDetailsVisible = ref(false)
 const selectedPartnerProduct = ref<PartnerProduct | null>(null)
 const route = useRoute()
-const { cartVisible, toggleCart, getCartProduct } = useCart()
+const { toggleCart, getCartProduct } = useCart()
 const {
   partner,
   productName,
@@ -135,6 +126,10 @@ onMounted(async () => {
   await getProducts(+route.params.id)
 
   await loading.dismiss()
+})
+
+watch(() => productName.value, ()=> {
+  filterByProductName()
 })
 
 onUnmounted(() => {

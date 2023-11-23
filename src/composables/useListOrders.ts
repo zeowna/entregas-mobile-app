@@ -1,4 +1,4 @@
-import { OrderStatuses } from '@/services/api/types';
+import { OrderStatus } from '@/services/api/types';
 import { computed, onMounted, ref } from 'vue';
 import { store } from '@/store';
 import { Api } from '@/services/api/Api';
@@ -14,32 +14,32 @@ export const useListOrders = () => {
     shouldFindMorePartners.value = true
   }
 
-  const getOrderStatusColor = (status: OrderStatuses) => {
+  const getOrderStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case OrderStatuses.Canceled:
+      case OrderStatus.Canceled:
         return 'danger'
-      case OrderStatuses.Settled:
+      case OrderStatus.Settled:
         return 'success'
-      case OrderStatuses.Created:
+      case OrderStatus.Created:
         return 'warning'
-      case OrderStatuses.InDelivery:
+      case OrderStatus.InDelivery:
         return 'primary'
-      case OrderStatuses.AwaitingExecution:
+      case OrderStatus.AwaitingExecution:
         return 'secondary'
     }
   }
 
-  const getOrderStatusText = (status: OrderStatuses) => {
+  const getOrderStatusText = (status: OrderStatus) => {
     switch (status) {
-      case OrderStatuses.Canceled:
+      case OrderStatus.Canceled:
         return 'Cancelado'
-      case OrderStatuses.Created:
+      case OrderStatus.Created:
         return 'Pedido Criado'
-      case OrderStatuses.AwaitingExecution:
+      case OrderStatus.AwaitingExecution:
         return 'Aguardando Pagamento'
-      case OrderStatuses.InDelivery:
+      case OrderStatus.InDelivery:
         return 'Entrega a caminho'
-      case OrderStatuses.Settled:
+      case OrderStatus.Settled:
         return 'Finalizado'
     }
   }

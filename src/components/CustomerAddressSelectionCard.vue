@@ -12,6 +12,8 @@
       </ion-button>
     </ion-card-content>
   </ion-card>
+
+  <CustomerAddressesModal :visible="addressesVisible" @close="toggleAddressesModal"/>
 </template>
 <script setup lang="ts">
 import { locationOutline } from "ionicons/icons";
@@ -19,6 +21,8 @@ import { formatAddressSmall } from "@/utils";
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon } from "@ionic/vue";
 
 import { useAddress } from "@/composables";
+import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
 
-const { addresses, toggleAddressesModal, selectedAddress} = useAddress()
+const { selectedAddress, addresses, addressesVisible, toggleAddressesModal } = useAddress()
+
 </script>

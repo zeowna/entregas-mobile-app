@@ -82,6 +82,7 @@ export abstract class AbstractResource<T extends Entity> {
 
     return token.value
       ? {
+        lang: 'pt-BR',
         Authorization: `Bearer ${token.value}`
       }
       : {}

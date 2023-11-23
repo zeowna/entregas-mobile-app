@@ -16,11 +16,15 @@
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-            Carrinho de compras
+            {{ order?.partner?.name  }}
           </ion-card-title>
-          <ion-card-subtitle>Listagem de produtos</ion-card-subtitle>
+          <ion-card-subtitle>
+            Listagem de produtos
+          </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
+
+
 
           <p v-for="product in cart" :key="product.partnerProduct.id">{{ product.quantity }}x {{
               product.partnerProduct.product.name
@@ -42,7 +46,7 @@
         <ion-card-content>
           <ion-row>
             <ion-col>
-              <ion-radio-group v-model="paymentMethod">
+              <ion-radio-group v-model="order.paymentMethod">
                 <ion-radio value="debit_card_location" label-placement="end">Débito na entrega</ion-radio>
                 <br/><br/>
                 <ion-radio value="credit_card_location" label-placement="end">Crédito na entrega</ion-radio>
@@ -55,7 +59,7 @@
             </ion-col>
           </ion-row>
 
-          <ion-row v-if="paymentMethod === 'cash_location'">
+          <ion-row v-if="order.paymentMethod === OrderPaymentMethods.CashLocation">
             <ion-col>
               <ion-label position="stacked">Troco para</ion-label>
               <ion-input v-model="changeValue" v-mask="'R$ ###'" placeholder="Troco para" aria-label="changeValue"/>
@@ -66,7 +70,6 @@
           <ion-button expand="block" :disabled="disableButton" @click="createOrder">Confirmar pedido</ion-button>
         </ion-card-content>
       </ion-card>
-      <CustomerAddressesModal :visible="addressesVisible" @close="toggleAddressesModal"/>
     </ion-content>
   </ion-modal>
 </template>
@@ -90,19 +93,19 @@ import {
   IonRadio,
   IonRadioGroup,
   IonRow,
+  IonTitle,
   IonToolbar,
-  loadingController,
+  loadingController
 } from '@ionic/vue';
 import { useAddress, useCart } from '@/composables';
 import { centsToCurrency } from "@/utils";
 import AppTitle from "@/components/AppTitle.vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Dialog } from "@capacitor/dialog";
 import { Api } from "@/services/api/Api";
 import { store } from "@/store";
-import { Address, Order } from "@/services/api/types";
+import { Address, CustomerUser, Order, OrderPaymentMethods, Partner } from "@/services/api/types";
 import router from "@/router";
-import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 
 const emit = defineEmits(['close'])
@@ -115,16 +118,30 @@ defineProps({
 })
 const user = computed(() => store.getters.getUser)
 
-const disableButton = computed(() => {
-  return !paymentMethod.value || paymentMethod.value === 'cash_location' && !changeValue.value || !sumCartValue()
-})
-const paymentMethod = ref(null)
 const changeValue = ref(0)
 
-const { cart, sumCartValue, reset } = useCart()
-const { selectedAddress, addressesVisible, toggleAddressesModal } = useAddress()
+const { cart, partner, sumCartValue, reset } = useCart()
+const { selectedAddress } = useAddress()
 
-const order = ref<Order | null>()
+const order = ref<Order>({
+  partnerId: partner.value?.id as number,
+  customer: user.value  as CustomerUser,
+  partner: partner.value as Partner,
+  address: selectedAddress.value as Address,
+  cart: cart.value,
+  paymentMethod: OrderPaymentMethods.DebitCardLocation
+})
+
+watch(() => partner.value , (partner) => {
+  order.value.partner = partner as Partner
+})
+
+const disableButton = computed(() => {
+  return !order.value.paymentMethod
+      || order.value.paymentMethod === OrderPaymentMethods.CashLocation
+      && !changeValue.value || !sumCartValue()
+})
+
 
 const createOrder = async () => {
   const { value } = await Dialog.confirm({
@@ -139,9 +156,12 @@ const createOrder = async () => {
     await loading.present()
 
     try {
-      order.value = await Api.customers.orders.create(user.value.id as number, order.value as Order)
-      await Api.customers.orders.addresses.create(order.value.id as number, selectedAddress.value as Address)
-      await Api.customers.orders.cart.create(order.value.id as number, cart.value)
+      order.value = await Api.customers.orders.create(user.value.id as number, {
+        ...order.value as Order,
+        partnerId: order.value?.partner?.id as number
+      })
+      await Api.customers.orders.addresses.create(user.value.id as number, order.value.id as number, selectedAddress.value as Address)
+      await Api.customers.orders.cart.create(user.value.id as number, order.value.id as number, cart.value)
 
       await loading.dismiss()
       reset()

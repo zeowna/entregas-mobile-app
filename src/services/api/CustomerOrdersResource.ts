@@ -1,24 +1,10 @@
 import { AbstractResource } from '@/services/api/AbstractResource'
-import { Address, CartProduct, FindEntitiesPaging, FindEntitiesResponse, Order, Product } from '@/services/api/types'
-
-export class CustomerOrdersAddressesResource extends AbstractResource<Address> {
-  protected url = '/orders'
-
-  async create(orderId: number, entity: Address) {
-    return super.post(`${this.url}/orders/${orderId}/addresses`, entity)
-  }
-}
-
-export class CustomerOrdersCartProductsResource extends AbstractResource<CartProduct> {
-  protected url = '/customer'
-
-  async create(orderId: number, cartProducts: CartProduct[]) {
-    return super.post(`${this.url}/orders/${orderId}/cartProducts`, cartProducts)
-  }
-}
+import { FindEntitiesPaging, FindEntitiesResponse, Order } from '@/services/api/types'
+import { CustomerOrdersAddressesResource } from "@/services/api/CustomerOrdersAddressesResource";
+import { CustomerOrdersCartProductsResource } from "@/services/api/CustomerOrdersCartProductsResource";
 
 export class CustomerOrdersResource extends AbstractResource<Order> {
-  protected url = '/customer'
+  protected url = '/customers'
 
   addresses = new CustomerOrdersAddressesResource(this.client)
   cart = new CustomerOrdersCartProductsResource(this.client)

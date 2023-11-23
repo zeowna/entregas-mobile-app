@@ -1,6 +1,6 @@
 import { AbstractResource } from '@/services/api/AbstractResource';
-import { Address, CustomerUser } from '@/services/api/types';
-import { CustomerOrdersResource } from "@/services/api/OrdersResource";
+import { CustomerUser } from '@/services/api/types';
+import { CustomerOrdersResource } from "@/services/api/CustomerOrdersResource";
 import { CustomerAddressesResource } from "@/services/api/customerAddressesResource";
 
 
@@ -10,8 +10,8 @@ export class CustomersResource extends AbstractResource<CustomerUser> {
   orders = new CustomerOrdersResource(this.client)
   addresses = new CustomerAddressesResource(this.client);
 
-  async findById(id: number) {
-    return super.get(`${this.url}/${id}`)
+  async create(entity: CustomerUser) {
+    return super.post(this.url, entity)
   }
 
   async update(id: number, entity: CustomerUser) {
