@@ -1,11 +1,11 @@
 <template>
   <Transition name="fade">
-    <div id="map" style="width: 100%; height: 50vw"></div>
+    <div :id="`map-${address?.id}`" style="width: 100%; height: 50vw">mapa</div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { Loader } from '@googlemaps/js-api-loader'
 import { Address } from "@/services/api/types";
 import { PropType } from "vue";
@@ -19,6 +19,7 @@ const props = defineProps({
 })
 
 const buildMap = async (address: Address) => {
+
   const loader = new Loader({
     apiKey: 'AIzaSyBuzYmU9c19xWHZ6JObfuX4PgfMtUzRydo',
     version: 'weekly',
@@ -39,7 +40,7 @@ const buildMap = async (address: Address) => {
     gestureHandling: 'none'
   }
 
-  const map = new Map(document.getElementById('map') as HTMLElement, mapOptions)
+  const map = new Map(document.getElementById('map-' + address.id) as HTMLElement, mapOptions)
 
   new google.maps.Marker({
     position: map.getCenter(),
@@ -47,11 +48,19 @@ const buildMap = async (address: Address) => {
   })
 }
 
+
 watch(() => props.address, (value) => {
   if (value) {
     buildMap(value)
   }
 })
+
+onMounted(() => {
+  buildMap(props.address)
+})
+
+
+
 </script>
 
 <style scoped>

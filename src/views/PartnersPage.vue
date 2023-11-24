@@ -83,11 +83,11 @@ import {
   loadingController,
 } from '@ionic/vue'
 import AppTitle from "@/components/AppTitle.vue";
-import { add, locationOutline, pin } from "ionicons/icons";
+import { locationOutline } from "ionicons/icons";
 import { useAddress, useListPartners } from '@/composables';
 import router from '@/router';
 import { onMounted, onUnmounted } from "vue";
-import { formatAddress, formatAddressSmall, getDistance } from "../utils";
+import { formatAddress, getDistance } from "../utils";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 import AppHeader from "@/components/AppHeader.vue";
 

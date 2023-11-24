@@ -1,6 +1,5 @@
-import { computed, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { Api } from '@/services/api/Api';
-import { store } from '@/store';
 import { FindEntitiesPaging, FindEntitiesResponse, Partner, PartnerStatuses } from "@/services/api/types";
 
 const shouldFindMorePartners = ref(false)
@@ -15,7 +14,7 @@ const data = ref<FindEntitiesResponse<Partner>>({
 const params = ref<FindEntitiesPaging>({
   conditions: { status: { eq: PartnerStatuses.Active } },
   skip: 0,
-  limit: 25
+  limit: 10
 })
 const isLoading = ref(false)
 
@@ -31,7 +30,7 @@ const reset = () => {
   params.value = {
     conditions: { status: { eq: PartnerStatuses.Active } },
     skip: 0,
-    limit: 25
+    limit: 10
   }
 }
 

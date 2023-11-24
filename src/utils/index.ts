@@ -1,4 +1,4 @@
-import { Address } from "@/services/api/types";
+import { Address, OrderPaymentMethods, OrderStatus } from "@/services/api/types";
 
 export const centsToCurrency = (value: number) => typeof value === 'number' ? 'R$ ' + (value / 100).toFixed(2).replace('.', ',') : 'R$ 0'
 export const centsToValue = (value: number) => value / 100
@@ -22,4 +22,86 @@ export const getDistance = ({ lat: lat1, lng: lng1 }: Address, { lat: lat2, lng:
     ? (km * 1000).toFixed(0) + 'm'
     : km.toFixed(2) + 'km'
 
+}
+
+export const formatOrderNumber = (number: number) => `${number}`.padStart(4, '0')
+
+export const getOrderStatusColorWeb = (status: OrderStatus) => {
+  switch (status) {
+    case OrderStatus.Created:
+      return 'info'
+    case OrderStatus.CanceledByPartner:
+    case OrderStatus.CanceledByCustomer:
+    case OrderStatus.RefusedByPartner:
+      return 'danger'
+    case OrderStatus.AcceptedByPartner:
+      return 'warning'
+    case OrderStatus.AwaitingExecution:
+      return 'warning'
+    case OrderStatus.InDelivery:
+      return 'info'
+    case OrderStatus.Settled:
+      return 'success'
+    default:
+      return ''
+  }
+}
+
+export const getOrderStatusColorApp = (status: OrderStatus) => {
+  switch (status) {
+    case OrderStatus.Created:
+      return 'primary'
+    case OrderStatus.CanceledByPartner:
+    case OrderStatus.CanceledByCustomer:
+    case OrderStatus.RefusedByPartner:
+      return 'danger'
+    case OrderStatus.AcceptedByPartner:
+      return 'warning'
+    case OrderStatus.AwaitingExecution:
+      return 'warning'
+    case OrderStatus.InDelivery:
+      return 'primary'
+    case OrderStatus.Settled:
+      return 'success'
+    default:
+      return ''
+  }
+}
+
+export const formatOrderStatus = (status: OrderStatus) => {
+  switch (status) {
+    case OrderStatus.Created:
+      return 'Criado'
+    case OrderStatus.CanceledByPartner:
+      return 'Cancelado pelo parceiro'
+    case OrderStatus.CanceledByCustomer:
+      return 'Cancelado pelo cliente'
+    case OrderStatus.RefusedByPartner:
+      return 'Recusado pelo parceiro'
+    case OrderStatus.AcceptedByPartner:
+      return 'Aceito pelo parceiro'
+    case OrderStatus.AwaitingExecution:
+      return 'Aguardando pagamento'
+    case OrderStatus.InDelivery:
+      return 'Saiu para entrega'
+    case OrderStatus.Settled:
+      return 'Finalizado'
+    default:
+      return ''
+  }
+}
+
+export const formatOrderPaymentMethod = (status: OrderPaymentMethods) => {
+  switch (status) {
+    case OrderPaymentMethods.DebitCardLocation:
+      return 'Débito na entrega'
+    case OrderPaymentMethods.CreditCardLocation:
+      return 'Crédito na entrega'
+    case OrderPaymentMethods.CashLocation:
+      return 'Dinheiro na entrega'
+    case OrderPaymentMethods.CardRemote:
+      return 'Crédito/Debito no App'
+    default:
+      return ''
+  }
 }

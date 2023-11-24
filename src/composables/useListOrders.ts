@@ -1,62 +1,69 @@
-import { OrderStatus } from '@/services/api/types';
-import { computed, onMounted, ref } from 'vue';
-import { store } from '@/store';
+import { computed, ref } from 'vue';
 import { Api } from '@/services/api/Api';
+import { FindEntitiesPaging, FindEntitiesResponse, Order, OrderStatus } from "@/services/api/types";
+import { store } from "@/store";
 
-export const useListOrders = () => {
-  const orders = computed(() => store.state.orders)
-  const shouldFindMorePartners = ref(false)
+const shouldFindMoreOrders = ref(false)
+const user = computed(() => store.getters.getUser)
 
-  const findOrders = async () => {
-    const orders = await Api.orders.find()
+const data = ref<FindEntitiesResponse<Order>>({
+  list: [],
+  count: 0,
+  skip: 0,
+  limit: 0,
+  pages: 0
+})
+const params = ref<FindEntitiesPaging>({
+  conditions: {},
+  skip: 0,
+  limit: 10,
+  sort: { statusUpdatedAt: -1 }
+})
+const isLoading = ref(false)
 
-    await store.dispatch('saveOrders', orders)
-    shouldFindMorePartners.value = true
+const reset = () => {
+  data.value = {
+    list: [],
+    count: 0,
+    skip: 0,
+    limit: 0,
+    pages: 0
   }
 
-  const getOrderStatusColor = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.Canceled:
-        return 'danger'
-      case OrderStatus.Settled:
-        return 'success'
-      case OrderStatus.Created:
-        return 'warning'
-      case OrderStatus.InDelivery:
-        return 'primary'
-      case OrderStatus.AwaitingExecution:
-        return 'secondary'
-    }
-  }
-
-  const getOrderStatusText = (status: OrderStatus) => {
-    switch (status) {
-      case OrderStatus.Canceled:
-        return 'Cancelado'
-      case OrderStatus.Created:
-        return 'Pedido Criado'
-      case OrderStatus.AwaitingExecution:
-        return 'Aguardando Pagamento'
-      case OrderStatus.InDelivery:
-        return 'Entrega a caminho'
-      case OrderStatus.Settled:
-        return 'Finalizado'
-    }
-  }
-
-  const ionInfinite = async (ev: Event) => {
-    await findOrders()
-    setTimeout(() => (ev.target as any).complete(), 2000);
-  }
-
-  onMounted(async () => findOrders())
-
-  return {
-    orders,
-    getOrderStatusColor,
-    getOrderStatusText,
-    shouldFindMorePartners,
-    ionInfinite
+  params.value = {
+    conditions: {},
+    skip: 0,
+    limit: 10,
+    sort: { statusUpdatedAt: -1 }
   }
 }
 
+const findOrders = async () => {
+  isLoading.value = true
+  const found = await Api.customers.orders.find(user.value.id as number, params.value)
+
+  data.value.list = [
+    ...data.value.list,
+    ...found.list
+  ]
+  params.value.skip! += params.value.limit!
+
+  shouldFindMoreOrders.value = !!found.list.length
+  isLoading.value = false
+}
+
+const ionInfinite = async (ev: Event) => {
+  await findOrders()
+}
+
+export const useListOrders = () => {
+  return {
+    shouldFindMoreOrders,
+    location,
+    params,
+    data,
+    reset,
+    findOrders,
+    ionInfinite
+  }
+}
