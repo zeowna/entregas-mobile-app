@@ -12,11 +12,11 @@
             {{ partner?.name }}
           </ion-card-title>
           <ion-card-subtitle>
-            {{ formatAddress(partner?.address) }}
+            {{ formatAddress(partner?.address!) }}
           </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <MapContainer :address="partner?.address"/>
+          <MapContainer :address="partner?.address!"/>
         </ion-card-content>
       </ion-card>
       <ion-card>

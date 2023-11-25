@@ -23,11 +23,11 @@
 
             <ion-label position="stacked">Nome</ion-label>
             <ion-input v-model="user.name" type="text" placeholder="Seu nome" aria-label="Nome"/>
-            <input-error :prop="v$.name"/>
+            <input-error :prop="(v$ as any).name"/>
 
             <ion-label position="stacked">CPF</ion-label>
-            <ion-input v-model="user.cpf" type="text" placeholder="Seu CPF" aria-label="CPF" maxlength="11"/>
-            <input-error :prop="v$.cpf" :error="errorsFromRequest?.cpf"/>
+            <ion-input v-model="user.cpf" type="text" placeholder="Seu CPF" aria-label="CPF" :maxlength="11"/>
+            <input-error :prop="(v$ as any).cpf" :error="errorsFromRequest?.cpf"/>
 
 
             <ion-label position="stacked">Data de Nascimento</ion-label>
@@ -43,7 +43,7 @@
               Ok
             </ion-button>
             <br/>
-            <input-error :prop="v$.birthday" :error="errorsFromRequest?.birthday"/>
+            <input-error :prop="(v$ as any).birthday" :error="errorsFromRequest?.birthday"/>
 
           </ion-card-content>
         </ion-card>
@@ -52,18 +52,18 @@
           <ion-card-content>
             <ion-label position="stacked">E-mail</ion-label>
             <ion-input v-model="user.email" type="text" placeholder="Seu E-mail" aria-label="E-mail"/>
-            <input-error :prop="v$.email" :error="errorsFromRequest?.email"/>
+            <input-error :prop="(v$ as any).email" :error="errorsFromRequest?.email"/>
 
 
             <ion-label position="stacked">Senha</ion-label>
             <ion-input v-model="user.password" type="password" placeholder="Sua Senha" aria-label="Senha"/>
-            <input-error :prop="v$.password"/>
+            <input-error :prop="(v$ as any).password"/>
 
 
             <ion-label position="stacked">Confirmar Senha</ion-label>
             <ion-input v-model="user.passwordConfirmation" type="password" placeholder="Confirme sua Senha"
                        aria-label="Confirmar Senha"/>
-            <input-error :prop="v$.passwordConfirmation"/>
+            <input-error :prop="(v$ as any).passwordConfirmation"/>
 
             <br/>
 

@@ -18,8 +18,8 @@
           </ion-card-header>
           <ion-card-content>
             <ion-label position="stacked">E-mail</ion-label>
-            <ion-input v-model="v$.email.$model" placeholder="Seu E-mail" aria-label="E-mail"/>
-            <input-error :prop="v$.email"/>
+            <ion-input v-model="(v$ as any).email.$model" placeholder="Seu E-mail" aria-label="E-mail"/>
+            <input-error :prop="(v$ as any).email"/>
             <ion-button expand="block" type="submit">Editar</ion-button>
           </ion-card-content>
         </ion-card>
@@ -33,15 +33,15 @@
           <form @submit.prevent="updatePassword">
             <div v-if="showPasswordFields">
               <ion-label position="stacked">Senha</ion-label>
-              <ion-input v-model="v$Password.password.$model" type="password" placeholder="Sua Senha"
+              <ion-input v-model="(v$Password as any).password.$model" type="password" placeholder="Sua Senha"
                          aria-label="Senha"/>
-              <input-error :prop="v$Password.password"/>
+              <input-error :prop="(v$Password as any).password"/>
 
               <ion-label position="stacked">Confirmar senha</ion-label>
-              <ion-input v-model="v$Password.passwordConfirmation.$model" type="password"
+              <ion-input v-model="(v$Password as any).passwordConfirmation.$model" type="password"
                          placeholder="Confirme sua Senha"
                          aria-label="Confirmar Senha"/>
-              <input-error :prop="v$Password.passwordConfirmation"/>
+              <input-error :prop="(v$Password as any).passwordConfirmation"/>
 
             </div>
             <ion-button v-if="!showPasswordFields" expand="block" type="button" @click="showPasswordFields = true">

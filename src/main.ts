@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { VMask } from 'ionic-vue-input-mask'
 
 import { IonicVue } from '@ionic/vue';

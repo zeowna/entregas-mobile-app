@@ -1,7 +1,7 @@
 <template>
   <small v-for="$error in prop?.$errors" :key="$error.$uid" class="input-error">{{ $error.$message }}<br/></small>
   <small v-for="key in Object.keys(error?.constraints ?? {})" :key="key + error?.property" class="input-error">{{
-      error.constraints[key]
+      error?.constraints[key]
     }}<br/></small>
 </template>
 

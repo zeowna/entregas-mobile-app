@@ -16,7 +16,7 @@
           <ion-card-title>
             {{ selectedPartnerProduct?.product?.name }} {{ selectedPartnerProduct?.product?.size }}
           </ion-card-title>
-          <ion-card-subtitle>{{ centsToCurrency(selectedPartnerProduct.value) }} por unidade
+          <ion-card-subtitle>{{ centsToCurrency(selectedPartnerProduct?.value!) }} por unidade
           </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
@@ -52,8 +52,8 @@
 
           <ion-row>
             <ion-col class="ion-text-center">
-              <h2 v-if="getCartProduct(selectedPartnerProduct?.id!)?.quantity > 0">
-                {{ centsToCurrency(getCartProduct(selectedPartnerProduct?.id!)?.totalValue) }}</h2>
+              <h2 v-if="getCartProduct(selectedPartnerProduct?.id!)?.quantity! > 0">
+                {{ centsToCurrency(getCartProduct(selectedPartnerProduct?.id!)?.totalValue as number) }}</h2>
             </ion-col>
           </ion-row>
 
@@ -94,7 +94,7 @@ const { getCartProduct, addProduct, removeProduct } = useCart()
 
 const props = defineProps({
   selectedPartnerProduct: {
-    type: Object as PropType<PartnerProduct>,
+    type: Object as PropType<PartnerProduct | null>,
     default: () => null
   },
   visible: {
@@ -106,7 +106,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const close = async (cancel?: boolean) => {
-  const cartProduct = getCartProduct(props.selectedPartnerProduct.id as number) as CartProduct
+  const cartProduct = getCartProduct(props.selectedPartnerProduct?.id as number) as CartProduct
 
   if (cancel && cartProduct?.quantity > 0) {
     const alert = await alertController.create({

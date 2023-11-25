@@ -14,12 +14,13 @@
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-          #{{ formatOrderNumber(order.id)}} - {{ order.partner.name }}     <ion-chip :color="getOrderStatusColorApp(order.status as OrderStatus)">
-            <small>{{ formatOrderStatus(order.status) }}</small>
+          #{{ formatOrderNumber(order.id as number)}} - {{ order?.partner?.name }}
+            <ion-chip :color="getOrderStatusColorApp(order.status as OrderStatus)">
+            <small>{{ formatOrderStatus(order.status as OrderStatus) }}</small>
           </ion-chip>
           </ion-card-title>
           <ion-card-subtitle>
-            {{ formatAddress(order.address) }}
+            {{ formatAddress(order.address as Address) }}
           </ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
@@ -28,17 +29,17 @@
 
           <ul class="ion-padding-start">
             <li v-for="cartProduct in order.cart" :key="cartProduct.id">
-              {{ cartProduct.quantity }}x {{ cartProduct.partnerProduct.product.name }}
-              {{ cartProduct.partnerProduct.product.size }}: <b>R$
+              {{ cartProduct.quantity }}x {{ cartProduct.partnerProduct?.product?.name }}
+              {{ cartProduct.partnerProduct?.product?.size }}: <b>R$
               {{ centsToCurrency(cartProduct.totalValue / cartProduct.quantity) }}</b>
             </li>
           </ul>
 
           <ion-row>
             <ion-col>
-              <h4>{{ new Date(order.statusUpdatedAt)?.toLocaleDateString() }} -
-                {{ new Date(order.statusUpdatedAt)?.toLocaleTimeString() }}</h4>
-              <h2><b>Valor total: R$ {{ centsToCurrency(order.totalValue) }}</b></h2>
+              <h4>{{ new Date(order.statusUpdatedAt as Date)?.toLocaleDateString() }} -
+                {{ new Date(order.statusUpdatedAt as Date)?.toLocaleTimeString() }}</h4>
+              <h2><b>Valor total: R$ {{ centsToCurrency(order.totalValue as number) }}</b></h2>
               <h3>{{ formatOrderPaymentMethod(order.paymentMethod) }}</h3>
             </ion-col>
           </ion-row>
@@ -73,7 +74,8 @@ import {
   IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle, IonChip,
+  IonCardTitle,
+  IonChip,
   IonCol,
   IonContent,
   IonHeader,
@@ -85,7 +87,7 @@ import {
 import { useOrder } from "@/composables";
 import AppTitle from "@/components/AppTitle.vue";
 import MapContainer from "@/components/MapContainer.vue";
-import { OrderStatus } from "@/services/api/types";
+import { Address, OrderStatus } from "@/services/api/types";
 
 const { order, cancelOrder } = useOrder()
 

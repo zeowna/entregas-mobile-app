@@ -21,15 +21,15 @@
       <ion-card v-for="order in data.list" :key="`order-${order.id}`" @click="toggleOrderModal(order.id)">
         <ion-card-header>
 
-          <ion-card-subtitle>{{ order.partner.name }}</ion-card-subtitle>
+          <ion-card-subtitle>{{ order.partner!.name }}</ion-card-subtitle>
           <ion-card-title>
             <ion-row>
               <ion-col>
-                <small># {{ formatOrderNumber(order.id) }}</small>
+                <small># {{ formatOrderNumber(order.id as number) }}</small>
               </ion-col>
               <ion-col class="ion-text-right">
                 <ion-chip :color="getOrderStatusColorApp(order.status as OrderStatus)">
-                  <small>{{ formatOrderStatus(order.status) }}</small>
+                  <small>{{ formatOrderStatus(order.status as OrderStatus) }}</small>
                 </ion-chip>
               </ion-col>
             </ion-row>
@@ -40,22 +40,22 @@
 
           <ion-row>
             <ion-col>
-              <small><b>{{ new Date(order.statusUpdatedAt)?.toLocaleDateString() }} -
-                {{ new Date(order.statusUpdatedAt)?.toLocaleTimeString() }}</b></small>
+              <small><b>{{ new Date(order.statusUpdatedAt as Date)?.toLocaleDateString() }} -
+                {{ new Date(order.statusUpdatedAt as Date)?.toLocaleTimeString() }}</b></small>
             </ion-col>
           </ion-row>
 
           <ul class="ion-padding-start">
             <li v-for="cartProduct in order.cart" :key="cartProduct.id">
-              {{ cartProduct.quantity }}x {{ cartProduct.partnerProduct.product.name }}
-              {{ cartProduct.partnerProduct.product.size }}: <b>R$
+              {{ cartProduct?.quantity }}x {{ cartProduct?.partnerProduct?.product?.name }}
+              {{ cartProduct?.partnerProduct?.product?.size }}: <b>R$
               {{ centsToCurrency(cartProduct.totalValue / cartProduct.quantity) }}</b>
             </li>
           </ul>
 
           <ion-row>
             <ion-col>
-              <h3><b>Valor total: R$ {{ centsToCurrency(order.totalValue) }}</b></h3>
+              <h3><b>Valor total: R$ {{ centsToCurrency(order?.totalValue!) }}</b></h3>
             </ion-col>
           </ion-row>
 
@@ -73,7 +73,6 @@
 
 <script setup lang="ts">
 import {
-  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
@@ -81,7 +80,7 @@ import {
   IonCardTitle,
   IonChip,
   IonCol,
-  IonContent, IonIcon, IonImg,
+  IonContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonPage,
@@ -96,7 +95,6 @@ import { centsToCurrency, formatOrderNumber, formatOrderStatus, getOrderStatusCo
 import { OrderStatus } from "@/services/api/types";
 import { onMounted, onUnmounted } from "vue";
 import OrderDetailsModal from "@/views/OrderDetailsModal.vue";
-import { locationOutline } from "ionicons/icons";
 
 const {
   shouldFindMoreOrders,
@@ -117,8 +115,7 @@ const handleRefresh = (event: CustomEvent) => {
     } catch (err) {
       console.error(err)
     } finally {
-      event?.target?.complete();
-
+      (event?.target as any).complete();
     }
   }, 2000);
 };

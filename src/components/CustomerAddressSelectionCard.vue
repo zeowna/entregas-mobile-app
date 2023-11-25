@@ -8,7 +8,7 @@
     <ion-card-content>
       <ion-button color="primary" expand="block" @click="toggleAddressesModal">
         <ion-icon :icon="locationOutline" slot="start"/>
-        {{ formatAddressSmall(selectedAddress) }}
+        {{ formatAddressSmall(selectedAddress as Address) }}
       </ion-button>
     </ion-card-content>
   </ion-card>
@@ -22,6 +22,7 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIco
 
 import { useAddress } from "@/composables";
 import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
+import { Address } from "../services/api/types";
 
 const { selectedAddress, addresses, addressesVisible, toggleAddressesModal } = useAddress()
 

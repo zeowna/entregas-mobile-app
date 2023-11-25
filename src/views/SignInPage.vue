@@ -13,11 +13,11 @@
         <ion-card >
           <ion-card-content>
             <ion-input v-model="credentials.email" placeholder="E-mail"/>
-            <input-error :prop="v$.email"/>
+            <input-error :prop="(v$ as any).email"/>
 
 
             <ion-input placeholder="Senha" type="password" v-model="credentials.password"/>
-            <input-error :prop="v$.password"/>
+            <input-error :prop="(v$ as any).password"/>
 
             <ion-button expand="block" type="submit">Entrar</ion-button>
 

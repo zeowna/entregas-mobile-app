@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gcp:config": "gsutil setmeta -h \"Cache-Control: public, max-age=0\" gs://entregas-mobile-app/*.html",
+    "gcp:deploy": "gcloud storage rsync ./dist gs://entregas-mobile-app --recursive",
+    "deploy": "yarn build --mode=production && yarn gcp:deploy && yarn gcp:config"
   },
   "dependencies": {
     "@capacitor/app": "5.0.2",

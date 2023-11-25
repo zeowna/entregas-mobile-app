@@ -110,8 +110,7 @@ const handleRefresh = (event: CustomEvent) => {
     reset()
 
     await findPartners()
-    // Any calls to load data go here
-    event?.target?.complete();
+    ;(event?.target as any).complete();
   }, 2000);
 };
 

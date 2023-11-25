@@ -25,8 +25,8 @@
         <ion-card-content>
 
           <p v-for="product in cart" :key="product.partnerProduct.id">{{ product.quantity }}x {{
-              product.partnerProduct.product.name
-            }} {{ product.partnerProduct.product.size }}</p>
+              product?.partnerProduct?.product?.name
+            }} {{ product?.partnerProduct?.product?.size }}</p>
 
           <br/>
 
