@@ -50,6 +50,7 @@ export const getOrderStatusColorWeb = (status: OrderStatus) => {
 export const getOrderStatusColorApp = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.Created:
+    case OrderStatus.AwaitingPartner:
       return 'primary'
     case OrderStatus.CanceledByPartner:
     case OrderStatus.CanceledByCustomer:
@@ -72,6 +73,8 @@ export const formatOrderStatus = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.Created:
       return 'Criado'
+    case OrderStatus.AwaitingPartner:
+      return 'Aguardando aprovação'
     case OrderStatus.CanceledByPartner:
       return 'Cancelado pelo parceiro'
     case OrderStatus.CanceledByCustomer:

@@ -6,14 +6,16 @@ import { Address } from './Address'
 
 export enum OrderStatus {
   Created = 'created',
+  AwaitingPartner = 'awaiting_partner',
   CanceledByPartner = 'canceled_by_partner',
   CanceledByCustomer = 'canceled_by_customer',
   AcceptedByPartner = 'accepted_by_partner',
-  RefusedByPartner = 'awaiting_partner',
+  RefusedByPartner = 'refused_by_Partner',
   AwaitingExecution = 'awaiting_execution',
   InDelivery = 'in_delivery',
   Settled = 'settled'
 }
+
 
 export enum OrderPaymentMethods {
   DebitCardLocation = 'debit_card_location',
