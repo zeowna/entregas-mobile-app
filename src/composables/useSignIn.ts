@@ -6,7 +6,7 @@ import useVuelidate from '@vuelidate/core';
 import { email, helpers, required } from '@vuelidate/validators'
 import router from '@/router';
 import { Dialog } from '@capacitor/dialog';
-import { loadingController } from '@ionic/vue';
+import { alertController, loadingController } from '@ionic/vue';
 import { ActionTypes } from "@/store/actions";
 
 const credentials = ref({
@@ -51,12 +51,15 @@ const signIn = async () => {
   } catch (err) {
     console.log(err)
 
-    await Dialog.alert({
-      title: 'Erro ao entrar',
+    const alert = await alertController.create({
+      header: 'Erro ao entrar',
       message: err instanceof Error
         ? err.message
         : err as string,
-    });
+      buttons: ['Ok']
+    })
+
+    await alert.present()
   } finally {
     await loading.dismiss()
   }
@@ -70,26 +73,35 @@ const forgotPassword = async () => {
 
   try {
     if (!credentials.value.email) {
-      await Dialog.alert({
-        title: 'Erro ao processar',
-        message: 'Precisamos do seu E-mail para te enviar uma nova senha'
-      });
+      const alert = await alertController.create({
+        header: 'Erro ao processar',
+        message: 'Precisamos do seu E-mail para te enviar uma nova senha',
+        buttons: ['Ok']
+      })
+
+      await alert.present()
 
       return
     }
 
     await Api.auth.forgotPassword(credentials.value.email)
 
-    await Dialog.alert({
-      title: 'Sucesso',
-      message: 'Te enviamos uma nova senha'
-    });
+    const alert = await alertController.create({
+      header: 'Sucesso',
+      message: 'Te enviamos uma nova senha',
+      buttons: ['Ok']
+    })
+
+    await alert.present()
 
   } catch (err) {
-    await Dialog.alert({
-      title: 'Erro ao processar',
-      message:  (err as Error).message ?? 'Não foi possível processar uma nova senha!'
-    });
+    const alert = await alertController.create({
+      header: 'Erro ao processar',
+      message: (err as Error).message ?? 'Não foi possível processar uma nova senha!',
+      buttons: ['Ok']
+    })
+
+    await alert.present()
   } finally {
     await loading.dismiss()
   }

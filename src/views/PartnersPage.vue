@@ -57,6 +57,8 @@
       <ion-infinite-scroll @ionInfinite="ionInfinite" :disabled="!shouldFindMorePartners">
         <ion-infinite-scroll-content loadingText="Aguarde..." loadingSpinner="circles"></ion-infinite-scroll-content>
       </ion-infinite-scroll>
+
+      <CustomerAddressesModal :visible="addressesVisible" @close="toggleAddressesModal"/>
     </ion-content>
   </ion-page>
 </template>
@@ -90,6 +92,7 @@ import { onMounted, onUnmounted } from "vue";
 import { formatAddress, getDistance } from "../utils";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 import AppHeader from "@/components/AppHeader.vue";
+import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
 
 const {
   shouldFindMorePartners,
@@ -99,7 +102,7 @@ const {
   ionInfinite
 } = useListPartners()
 
-const { selectedAddress, addresses, toggleAddressesModal } = useAddress()
+const { selectedAddress, addressesVisible, addresses, toggleAddressesModal } = useAddress()
 
 const goToPartner = async (partnerId: number) => {
   await router.push(`/tabs/partnerListTab/partner/${partnerId}`)

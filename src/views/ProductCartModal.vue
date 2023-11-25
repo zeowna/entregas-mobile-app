@@ -16,7 +16,7 @@
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-            {{ order?.partner?.name  }}
+            {{ order?.partner?.name }}
           </ion-card-title>
           <ion-card-subtitle>
             Listagem de produtos
@@ -123,14 +123,14 @@ const { selectedAddress } = useAddress()
 
 const order = ref<Order>({
   partnerId: partner.value?.id as number,
-  customer: user.value  as CustomerUser,
+  customer: user.value as CustomerUser,
   partner: partner.value as Partner,
   address: selectedAddress.value as Address,
   cart: cart.value,
   paymentMethod: OrderPaymentMethods.DebitCardLocation
 })
 
-watch(() => partner.value , (partner) => {
+watch(() => partner.value, (partner) => {
   order.value.partner = partner as Partner
 })
 
@@ -142,49 +142,55 @@ const disableButton = computed(() => {
 
 
 const createOrder = async () => {
-  const { value } = await Dialog.confirm({
-    title: 'Confirmar pedido',
+  const alert = await alertController.create({
+    header: 'Confirmar pedido',
     message: `Podemos confirmar seu pedido?`,
-  });
+    buttons: [
+      {
+        text: 'Sim', handler: async () => {
+          const loading = await loadingController.create({
+            message: 'Carregando...',
+          });
+          await loading.present()
 
-  if (value) {
-    const loading = await loadingController.create({
-      message: 'Carregando...',
-    });
-    await loading.present()
+          try {
+            order.value = await Api.customers.orders.create(user.value.id as number, {
+              ...order.value as Order,
+              partnerId: order.value?.partner?.id as number
+            })
+            await Api.customers.orders.addresses.create(user.value.id as number, order.value.id as number, selectedAddress.value as Address)
+            await Api.customers.orders.cart.create(user.value.id as number, order.value.id as number, cart.value)
 
-    try {
-      order.value = await Api.customers.orders.create(user.value.id as number, {
-        ...order.value as Order,
-        partnerId: order.value?.partner?.id as number
-      })
-      await Api.customers.orders.addresses.create(user.value.id as number, order.value.id as number, selectedAddress.value as Address)
-      await Api.customers.orders.cart.create(user.value.id as number, order.value.id as number, cart.value)
+            await loading.dismiss()
+            reset()
+            await router.push('/tabs/ordersTab')
+            close()
+          } catch (err) {
+            await loading.dismiss()
+            const alert = await alertController.create({
+              header: 'Erro ao criar Pedido',
+              message: 'Infelizmente alguns itens se tornaram indisponíveis.',
+              buttons: [
+                {
+                  text: 'Entendi',
+                  handler: async () => {
+                    reset()
+                    await router.push('/tabs/ordersTab')
+                    close()
+                  }
+                }
+              ],
+            });
 
-      await loading.dismiss()
-      reset()
-      await router.push('/tabs/ordersTab')
-      close()
-    } catch (err) {
-      await loading.dismiss()
-      const alert = await alertController.create({
-        header: 'Erro ao criar Pedido',
-        message: 'Infelizmente alguns itens se tornaram indisponíveis.',
-        buttons: [
-          {
-            text: 'Entendi',
-            handler: async () => {
-              reset()
-              await router.push('/tabs/ordersTab')
-              close()
-            }
+            await alert.present();
           }
-        ],
-      });
+        }
+      },
+      { text: 'Não', role: 'cancel' }
+    ]
+  })
 
-      await alert.present();
-    }
-  }
+  await alert.present()
 }
 
 const close = () => {

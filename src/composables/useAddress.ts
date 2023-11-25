@@ -2,7 +2,7 @@ import { computed, ref, watch } from "vue";
 import { Address, CustomerUser } from "@/services/api/types";
 import { store } from "@/store";
 import { Api } from "@/services/api/Api";
-import { loadingController } from "@ionic/vue";
+import { alertController, loadingController } from "@ionic/vue";
 import { ActionTypes } from "@/store/actions";
 import { Dialog } from "@capacitor/dialog";
 import { helpers, required } from "@vuelidate/validators";
@@ -110,32 +110,36 @@ const createAddress = async () => {
 }
 
 const removeAddress = async (addressId: number) => {
-  const {  value } = await Dialog.confirm({
-    title: 'Remover endereço',
-    message: 'Deseja remover este endereço?'
+  const alert = await alertController.create({
+    header: 'Remover endereço',
+    message: 'Deseja remover este endereço?',
+    buttons: [
+      {
+        text: 'Sim',
+        handler: async () => {
+          const loading = await loadingController.create({
+            message: 'Carregando...',
+          });
+          await loading.present()
+          try {
+            await Api.customers.addresses.remove(
+              user.value.id as number,
+              addressId
+            )
+            await store.dispatch(ActionTypes.REFRESH_TOKEN, { force: true})
+          } catch (err) {
+            console.error(err)
+          } finally {
+            reset()
+            await loading.dismiss()
+          }
+        }
+      },
+      { text: 'Não', role: "cancel" }
+    ]
   })
 
-
-  if (!value) {
-    return
-  }
-
-  const loading = await loadingController.create({
-    message: 'Carregando...',
-  });
-  await loading.present()
-  try {
-    await Api.customers.addresses.remove(
-      user.value.id as number,
-      addressId
-    )
-    await store.dispatch(ActionTypes.REFRESH_TOKEN, { force: true})
-  } catch (err) {
-    console.error(err)
-  } finally {
-    reset()
-    await loading.dismiss()
-  }
+  await alert.present()
 }
 
 watch(() => addresses.value, (value) => {

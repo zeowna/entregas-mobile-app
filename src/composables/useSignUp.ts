@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import { store } from '@/store';
 import useVuelidate from '@vuelidate/core';
 import { email, helpers, required, sameAs, } from '@vuelidate/validators';
-import { loadingController } from '@ionic/vue';
+import { alertController, loadingController } from '@ionic/vue';
 import { Dialog } from '@capacitor/dialog';
 import { ValidationError } from '@/services/api/errors';
 import { BadRequestError } from '@/services/api/errors/BadRequestError';
@@ -84,10 +84,13 @@ export const useSignUp = () => {
     } catch (err: any) {
       console.error(err)
 
-      await Dialog.alert({
-        title: 'Erro!',
-        message: err.message ?? "Erro ao Criar Conta"
-      });
+      const alert = await alertController.create({
+        header: 'Erro!',
+        message: err.message ?? "Erro ao Criar Conta",
+        buttons: ['OK']
+      })
+
+      await alert.present()
 
       if (err instanceof BadRequestError) {
         err.errors.map(
