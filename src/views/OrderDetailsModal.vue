@@ -14,10 +14,10 @@
       <ion-card>
         <ion-card-header>
           <ion-card-title>
-          #{{ formatOrderNumber(order.id as number)}} - {{ order?.partner?.name }}
+            #{{ formatOrderNumber(order.id as number) }} - {{ order?.partner?.name }}
             <ion-chip :color="getOrderStatusColorApp(order.status as OrderStatus)">
-            <small>{{ formatOrderStatus(order.status as OrderStatus) }}</small>
-          </ion-chip>
+              <small>{{ formatOrderStatus(order.status as OrderStatus) }}</small>
+            </ion-chip>
           </ion-card-title>
           <ion-card-subtitle>
             {{ formatAddress(order.address as Address) }}
@@ -25,7 +25,7 @@
         </ion-card-header>
         <ion-card-content>
 
-          <MapContainer :address="order.address" v-if="order.address" />
+          <MapContainer :address="order.address" v-if="order.address"/>
 
           <ul class="ion-padding-start">
             <li v-for="cartProduct in order.cart" :key="cartProduct.id">
@@ -45,9 +45,9 @@
           </ion-row>
 
 
-          <div  v-if="order.status === OrderStatus.Created">
-            <br />
-            <br />
+          <div v-if="!alreadySettled">
+            <br/>
+            <br/>
             <ion-button expand="block" color="danger" @click="cancelOrder">Cancelar Pedido</ion-button>
           </div>
 
@@ -87,16 +87,19 @@ import {
 import { useOrder } from "@/composables";
 import AppTitle from "@/components/AppTitle.vue";
 import MapContainer from "@/components/MapContainer.vue";
-import { Address, OrderStatus } from "@/services/api/types";
+import { Address, Order, OrderStatus } from "@/services/api/types";
+import { computed } from "vue";
 
 const { order, cancelOrder } = useOrder()
 
- defineProps({
+defineProps({
   visible: {
     type: Boolean,
     default: false
   }
 })
+
+const alreadySettled = computed(() => [OrderStatus.Settled, OrderStatus.CanceledByPartner, OrderStatus.CanceledByCustomer, OrderStatus.RefusedByPartner].includes(order!.value!.status as OrderStatus))
 
 const emit = defineEmits(['close'])
 

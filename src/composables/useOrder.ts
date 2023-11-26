@@ -49,10 +49,6 @@ const cancelOrder = async () => {
     header: 'Deseja cancelar o pedido?',
     buttons: [
       {
-        text: 'Não',
-        role: "cancel"
-      },
-      {
         text: 'Sim',
         handler: async () => {
           const loading = await loadingController.create({
@@ -70,7 +66,11 @@ const cancelOrder = async () => {
             await loading.dismiss()
           }
         }
-      }
+      },
+      {
+        text: 'Não',
+        role: "cancel"
+      },
     ]
   })
 

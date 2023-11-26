@@ -10,7 +10,7 @@ import useVuelidate from "@vuelidate/core";
 
 const addressesVisible = ref(false)
 const user = computed<CustomerUser>(() => store.getters.getUser)
-const addresses = computed<Address[]>(() => user.value?.addresses as Address[])
+const addresses = computed<Address[]>(() => user.value?.addresses as Address[] || [])
 const showForm = ref(false)
 
 const address = ref<Address>({

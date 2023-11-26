@@ -5,8 +5,8 @@
         <AppTitle/>
       </ion-title>
       <ion-buttons slot="end">
-        <ion-button @click="toggleCart">
-          <ion-icon :icon="cart" />
+        <ion-button @click="toggleCart" :disabled="!cart.length">
+          <ion-icon :icon="cartIcon" />
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
@@ -15,13 +15,13 @@
 </template>
 
 <script setup lang="ts">
-import { cart } from "ionicons/icons";
+import { cart as cartIcon } from "ionicons/icons";
 import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from "@ionic/vue";
 import AppTitle from "@/components/AppTitle.vue";
 import { useCart } from "@/composables";
 import ProductCartModal from "@/views/ProductCartModal.vue";
 
-const { cartVisible, toggleCart, getCartProduct } = useCart()
+const { cart, cartVisible, toggleCart } = useCart()
 
 </script>
 

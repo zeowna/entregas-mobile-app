@@ -16,7 +16,7 @@
           <ion-card-title>
             Meus Endereços
           </ion-card-title>
-          <ion-card-subtitle>
+          <ion-card-subtitle v-if="selectedAddress">
             <ion-icon :icon="locationOutline"/>
             {{ formatAddressSmall(selectedAddress as Address) }}
           </ion-card-subtitle>
@@ -25,8 +25,8 @@
 
           <h2>Selecione ou adicione um endereço para entrega</h2>
 
-          <ion-list v-if="!showForm">
-              <div v-for="address in addresses" :key="address.id">
+          <ion-list v-if="!showForm && addresses.length">
+              <div v-for="address in addresses" :key="`customer-address-${address.id}`">
                 <ion-item-sliding>
                   <ion-item @click="assignSelectedAddress(address)">
                     <ion-icon aria-hidden="true" slot="end" :icon="caretForwardOutline" />
