@@ -16,10 +16,12 @@ export class PartnersResource extends AbstractResource<Partner> {
     conditions = {},
     skip = 0,
     limit = 15,
-    sort = { updatedAt: -1 }
-  }: FindEntitiesPaging = {}) {
+    sort = { updatedAt: -1 },
+               coordinates
+  }: FindEntitiesPaging  & { coordinates?: { lat: number, lng: number } | null } = {}) {
     return this.get<FindEntitiesResponse<Partner>>(this.url, {
       conditions: JSON.stringify(conditions),
+      coordinates: JSON.stringify(coordinates),
       skip,
       limit,
       sort: JSON.stringify(sort)

@@ -17,14 +17,14 @@ Esse repositório versiona a Mobile app do Entregas
 ## Instalaçao
 
 ```bash
-$ yarn install
+$ npm install
 ```
 
 ## Rodando a aplicação
 
 ```bash
 # Desenvolvimento
-$ yarn dev
+$ npm run dev
 
 # build para Produção
 $ yarn build --mode=production

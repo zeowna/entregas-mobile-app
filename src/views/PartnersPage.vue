@@ -41,7 +41,7 @@
             <ion-card-title>{{ partner.name }}</ion-card-title>
 
             <ion-card-subtitle>
-              {{ formatAddress(partner.address) }} <br />
+              {{ formatAddress(partner.address) }} <br/>
               {{ getDistance(selectedAddress, partner.address) }}
 
             </ion-card-subtitle>
@@ -85,24 +85,25 @@ import {
   loadingController,
 } from '@ionic/vue'
 import AppTitle from "@/components/AppTitle.vue";
-import { locationOutline } from "ionicons/icons";
-import { useAddress, useListPartners } from '@/composables';
+import {locationOutline} from "ionicons/icons";
+import {useAddress, useListPartners} from '@/composables';
 import router from '@/router';
-import { onMounted, onUnmounted } from "vue";
-import { formatAddress, getDistance } from "../utils";
+import {onMounted, onUnmounted, watch} from "vue";
+import {formatAddress, getDistance} from "../utils";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import CustomerAddressesModal from "@/views/CustomerAddressesModal.vue";
 
 const {
   shouldFindMorePartners,
+  params,
   data,
   reset,
   findPartners,
   ionInfinite
 } = useListPartners()
 
-const { selectedAddress, addressesVisible, addresses, toggleAddressesModal } = useAddress()
+const {selectedAddress, addressesVisible, addresses, toggleAddressesModal} = useAddress()
 
 const goToPartner = async (partnerId: number) => {
   await router.push(`/tabs/partnerListTab/partner/${partnerId}`)
@@ -112,10 +113,31 @@ const handleRefresh = (event: CustomEvent) => {
   setTimeout(async () => {
     reset()
 
-    await findPartners()
-    ;(event?.target as any).complete();
+    if (selectedAddress.value) {
+      params.value.coordinates = {
+        lat: selectedAddress.value?.lat as number,
+        lng: selectedAddress.value?.lng as number
+      }
+
+      await findPartners()
+    }
+
+    (event?.target as any).complete();
   }, 2000);
 };
+
+watch(() => selectedAddress.value, async (value) => {
+  reset()
+
+  if (value) {
+    params.value.coordinates = {
+      lat: value?.lat as number,
+      lng: value?.lng as number
+    }
+
+    await findPartners()
+  }
+})
 
 
 onMounted(async () => {
@@ -123,8 +145,15 @@ onMounted(async () => {
     message: 'Carregando...',
   });
   await loading.present()
+
   reset()
+
   if (selectedAddress.value) {
+    params.value.coordinates = {
+      lat: selectedAddress.value?.lat as number,
+      lng: selectedAddress.value?.lng as number
+    }
+
     await findPartners()
   }
 

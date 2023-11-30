@@ -11,10 +11,17 @@ const data = ref<FindEntitiesResponse<Partner>>({
   limit: 0,
   pages: 0
 })
-const params = ref<FindEntitiesPaging>({
-  conditions: { status: { eq: PartnerStatuses.Active } },
+const params = ref<FindEntitiesPaging & { coordinates?: { lat: number, lng: number } | null }>({
+  conditions: {
+    status: {
+      eq: PartnerStatuses.Active,
+    },
+    isOnline: { eq: true }
+  },
   skip: 0,
-  limit: 10
+  limit: 10,
+  coordinates: null,
+
 })
 const isLoading = ref(false)
 
@@ -28,9 +35,15 @@ const reset = () => {
   }
 
   params.value = {
-    conditions: { status: { eq: PartnerStatuses.Active } },
+    conditions: {
+      status: {
+        eq: PartnerStatuses.Active,
+      },
+      isOnline: { eq: true }
+    },
     skip: 0,
-    limit: 10
+    limit: 10,
+    coordinates: null
   }
 }
 
