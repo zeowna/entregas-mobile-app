@@ -6,7 +6,7 @@
           <ion-button @click="close">Voltar</ion-button>
         </ion-buttons>
         <ion-title>
-          <AppTitle/>
+          <AppTitle />
         </ion-title>
       </ion-toolbar>
     </ion-header>
@@ -18,8 +18,8 @@
           </ion-card-header>
           <ion-card-content>
             <ion-label position="stacked">E-mail</ion-label>
-            <ion-input v-model="(v$ as any).email.$model" placeholder="Seu E-mail" aria-label="E-mail"/>
-            <input-error :prop="(v$ as any).email"/>
+            <ion-input v-model="(v$ as any).email.$model" placeholder="Seu E-mail" aria-label="E-mail" />
+            <input-error :prop="(v$ as any).email" />
             <ion-button expand="block" type="submit">Editar</ion-button>
           </ion-card-content>
         </ion-card>
@@ -34,14 +34,13 @@
             <div v-if="showPasswordFields">
               <ion-label position="stacked">Senha</ion-label>
               <ion-input v-model="(v$Password as any).password.$model" type="password" placeholder="Sua Senha"
-                         aria-label="Senha"/>
-              <input-error :prop="(v$Password as any).password"/>
+                aria-label="Senha" />
+              <input-error :prop="(v$Password as any).password" />
 
               <ion-label position="stacked">Confirmar senha</ion-label>
               <ion-input v-model="(v$Password as any).passwordConfirmation.$model" type="password"
-                         placeholder="Confirme sua Senha"
-                         aria-label="Confirmar Senha"/>
-              <input-error :prop="(v$Password as any).passwordConfirmation"/>
+                placeholder="Confirme sua Senha" aria-label="Confirmar Senha" />
+              <input-error :prop="(v$Password as any).passwordConfirmation" />
 
             </div>
             <ion-button v-if="!showPasswordFields" expand="block" type="button" @click="showPasswordFields = true">
@@ -54,7 +53,6 @@
 
     </ion-content>
   </ion-modal>
-
 </template>
 
 <script lang="ts" setup>
@@ -71,6 +69,8 @@ import {
   IonLabel,
   IonModal,
   IonToolbar,
+alertController,
+loadingController,
 } from '@ionic/vue'
 import { computed, onMounted, Ref, ref } from 'vue';
 import { store } from '@/store';
@@ -116,19 +116,42 @@ const close = () => {
 const showPasswordFields = ref(false)
 
 const updateEmail = async () => {
+  const loading = await loadingController.create({ message: 'Salvando...' })
+
   const valid = await v$.value.$validate()
 
-  if (user.value && valid) {
+
+  try {
+    await loading.present()
+
+    if (user.value && valid) {
     await Api.me.update(user.value)
+  }
+  } catch (err) {
+    const alert = await alertController.create({ header: 'Erro ao salvar e-mail', buttons: ['Ok'] })
+    await alert.present()
+  } finally {
+    await loading.dismiss()
   }
 }
 
 const updatePassword = async () => {
+  const loading = await loadingController.create({ message: 'Salvando...' })
+
+
   const valid = await v$Password.value.$validate()
 
+  try {
+    await loading.present()
 
-  if (user.value && valid) {
-    await Api.me.updateMyPassword(user.value.password!)
+    if (user.value && valid) {
+      await Api.me.updateMyPassword(user.value.password!)
+    }
+  } catch (err) {
+    const alert = await alertController.create({ header: 'Erro ao salvar senha', buttons: ['Ok'] })
+    await alert.present()
+  } finally {
+    await loading.dismiss()
   }
 }
 
