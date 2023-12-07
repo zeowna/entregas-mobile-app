@@ -107,7 +107,7 @@ const {
 } = usePartner()
 
 const {
- partner: cartPartner
+ partner: cartPartner,
  reset: resetCart
 } = useCart()
 
