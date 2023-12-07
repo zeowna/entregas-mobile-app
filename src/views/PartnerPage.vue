@@ -81,9 +81,10 @@ import {
   IonInput,
   IonPage,
   IonRow,
-  loadingController
+  loadingController,
+  alertController
 } from '@ionic/vue'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { search } from 'ionicons/icons';
 import { useCart, usePartner } from '@/composables';
 import { onMounted, onUnmounted, ref, watch } from "vue";
@@ -96,6 +97,7 @@ import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionC
 
 const productDetailsVisible = ref(false)
 const selectedPartnerProduct = ref<PartnerProduct | null>(null)
+const router = useRouter()
 const route = useRoute()
 const { toggleCart, getCartProduct } = useCart()
 const {
@@ -103,6 +105,11 @@ const {
   productName,
   groupedPartnerProducts, getProducts, getPartner, filterByProductName, reset
 } = usePartner()
+
+const {
+ partner: cartPartner
+ reset: resetCart
+} = useCart()
 
 const toggleProductDetails = () => {
   productDetailsVisible.value = !productDetailsVisible.value
@@ -125,16 +132,31 @@ onMounted(async () => {
   await getProducts(+route.params.id)
 
   await loading.dismiss()
+
+  if(cartPartner.value && (partner.id !== cartPartner?.id)) {
+    const alert = await alertController.create({ header: 'Você já estava comprando de outro Parceiro', buttons: [
+      { 
+        text: 'Voltar para o Parceiro anterior',
+        handler: async () => { 
+          await router.push(`/tabs/partnerListTab/partner/${cartPartner?.value?.id}`)
+        }
+      },
+      {
+        text: 'Voltar para o Parceiro anterior',
+        handler: async () => { 
+          resetCart()
+        }
+      }
+    ]})
+
+    await alert.present()
+  }
 })
 
 watch(() => productName.value, ()=> {
   filterByProductName()
 })
 
-// watch(() => selectedAddress.value, async ()=> {
-//   resetCart()
-//   await router.push('/tabs/partnersTab')
-// })
 
 onUnmounted(() => {
   reset()
