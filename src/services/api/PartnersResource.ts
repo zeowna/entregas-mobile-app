@@ -3,7 +3,7 @@ import { Partner } from '@/services/api/types/Partner'
 import { PartnerProductsResource } from '@/services/api/PartnerProductsResource'
 import { PartnerUsersResource } from '@/services/api/PartnerUsersResource'
 import { PartnerAddressesResource } from '@/services/api/PartnerAddressesResource'
-import { FindEntitiesPaging, FindEntitiesResponse } from '@/services/api/types'
+import { FindEntitiesPaging, FindEntitiesResponse, FindPartnersByDistancePaging } from '@/services/api/types'
 
 export class PartnersResource extends AbstractResource<Partner> {
   protected url = '/partners'
@@ -13,23 +13,35 @@ export class PartnersResource extends AbstractResource<Partner> {
   readonly addresses = new PartnerAddressesResource(this.client)
 
   async find({
-    conditions = {},
-    skip = 0,
-    limit = 15,
-    sort = { updatedAt: -1 },
-               coordinates
-  }: FindEntitiesPaging  & { coordinates?: { lat: number, lng: number } | null } = {}) {
+               conditions = {},
+               skip = 0,
+               limit = 15,
+               sort = {updatedAt: -1},
+             }: FindEntitiesPaging = {}) {
     return this.get<FindEntitiesResponse<Partner>>(this.url, {
       conditions: JSON.stringify(conditions),
-      coordinates: JSON.stringify(coordinates),
       skip,
       limit,
       sort: JSON.stringify(sort)
     })
   }
 
+  async findByDistance({
+                         coordinates,
+                         skip = 0,
+                         limit = 15,
+                         maxDistanceInMeters = 50000
+                       }: FindPartnersByDistancePaging) {
+    return this.get<FindEntitiesResponse<Partner>>(`${ this.url }/distance`, {
+      coordinates: JSON.stringify(coordinates),
+      maxDistanceInMeters,
+      skip,
+      limit,
+    })
+  }
+
   async findById(id: number) {
-    return super.get(`${this.url}/${id}`)
+    return super.get(`${ this.url }/${ id }`)
   }
 
   async create(entity: Partner) {
@@ -37,10 +49,10 @@ export class PartnersResource extends AbstractResource<Partner> {
   }
 
   async update(id: number, entity: Partner) {
-    return this.patch(`${this.url}/${id}`, entity)
+    return this.patch(`${ this.url }/${ id }`, entity)
   }
 
   async uploadPicture(id: number, file: File) {
-    return this.postMultipart(`${this.url}/${id}/pictures`, file)
+    return this.postMultipart(`${ this.url }/${ id }/pictures`, file)
   }
 }

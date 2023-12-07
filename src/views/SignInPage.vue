@@ -66,7 +66,10 @@ import AppTitle from '@/components/AppTitle.vue';
 import { useSignIn } from '@/composables';
 import SignUpModal from '@/views/SignUpModal.vue';
 import InputError from '@/components/InputError.vue';
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { store } from '@/store';
+import { ActionTypes } from '@/store/actions';
+import router from '@/router';
 
 const { credentials, signIn, forgotPassword, v$ } = useSignIn()
 const visible = ref(false)
@@ -79,6 +82,18 @@ const close = () => {
   visible.value = false
 }
 
+onMounted(async () => {
+  const token = computed(() => store.getters.getToken)
+  const user = computed(() => store.getters.getUser)
+
+  if (token.value) {
+    await store.dispatch(ActionTypes.REFRESH_TOKEN, true)
+
+    if (user.value) {
+      router.push('tabs')
+    }
+  }
+})
 
 </script>
 

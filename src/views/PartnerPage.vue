@@ -41,20 +41,23 @@
                 <h2><b>{{ group }}</b></h2>
               </ion-col>
             </ion-row>
-            <ion-row v-for="partnerProduct in groupedPartnerProducts[group]" :key="partnerProduct.id">
-              <ion-col size="sm">
-                {{ getCartProduct(partnerProduct?.id!)?.quantity || 0 }}
-              </ion-col>
-              <ion-col>
-                <p>{{ partnerProduct.product!.name }} {{ partnerProduct.product!.size }}</p>
-                <b>+ R$ {{ (partnerProduct.value / 100).toFixed(2).replace('.', ',') }}</b>
-              </ion-col>
-              <ion-col size="sm">
-                <ion-button size="small" @click="selectProductToShow(partnerProduct)">
-                  Ver
-                </ion-button>
-              </ion-col>
-            </ion-row>
+            <ion-grid>
+              <ion-row v-for="partnerProduct in groupedPartnerProducts[group]" :key="partnerProduct.id">
+                <ion-col size="2">
+                  {{ getCartProduct(partnerProduct?.id!)?.quantity || 0 }}
+                </ion-col>
+                <ion-col size="8">
+                  <p>{{ partnerProduct.product!.name }} {{ partnerProduct.product!.size }}</p>
+                  <b>+ R$ {{ (partnerProduct.value / 100).toFixed(2).replace('.', ',') }}</b>
+                </ion-col>
+                <ion-col size="2" @click="selectProductToShow(partnerProduct)">
+                  <!-- <ion-button size="small" @click="selectProductToShow(partnerProduct)">
+                    Ver
+                  </ion-button> -->
+                  <ion-img :src="partnerProduct.product?.pictureURI" />
+                </ion-col>
+              </ion-row>
+          </ion-grid>
           </div>
           <br/>
           <ion-button expand="block" @click="toggleCart">Ir para carrinho de compras</ion-button>
@@ -145,5 +148,4 @@ onUnmounted(() => {
 .ios > .search-col {
   padding-top: 5%;
 }
-
 </style>

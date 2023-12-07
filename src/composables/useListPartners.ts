@@ -1,6 +1,12 @@
 import { ref } from 'vue';
 import { Api } from '@/services/api/Api';
-import { FindEntitiesPaging, FindEntitiesResponse, Partner, PartnerStatuses } from "@/services/api/types";
+import {
+  FindEntitiesPaging,
+  FindEntitiesResponse,
+  FindPartnersByDistancePaging,
+  Partner,
+  PartnerStatuses
+} from "@/services/api/types";
 
 const shouldFindMorePartners = ref(false)
 
@@ -11,16 +17,10 @@ const data = ref<FindEntitiesResponse<Partner>>({
   limit: 0,
   pages: 0
 })
-const params = ref<FindEntitiesPaging & { coordinates?: { lat: number, lng: number } | null }>({
-  conditions: {
-    status: {
-      eq: PartnerStatuses.Active,
-    },
-    isOnline: { eq: true }
-  },
+const params = ref<FindPartnersByDistancePaging>({
+  coordinates: null,
   skip: 0,
   limit: 10,
-  coordinates: null,
 
 })
 const isLoading = ref(false)
@@ -35,27 +35,21 @@ const reset = () => {
   }
 
   params.value = {
-    conditions: {
-      status: {
-        eq: PartnerStatuses.Active,
-      },
-      isOnline: { eq: true }
-    },
+    coordinates: null,
     skip: 0,
     limit: 10,
-    coordinates: null
   }
 }
 
 const findPartners = async () => {
   isLoading.value = true
-  const found = await Api.partners.find(params.value)
+  const found = await Api.partners.findByDistance(params.value)
 
   data.value.list = [
     ...data.value.list,
     ...found.list
   ]
-  params.value.skip! += params.value.limit!
+  params.value.skip! += params.value.limit as number
 
   shouldFindMorePartners.value = !!found.list.length
   isLoading.value = false

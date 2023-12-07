@@ -4,23 +4,40 @@ export const centsToCurrency = (value: number) => typeof value === 'number' ? 'R
 export const centsToValue = (value: number) => value / 100
 export const formatAddress = (address: Address) => address ? `${address.street}, ${address.number},  ${address.neighbourhood} - ${address.city}` : ''
 
-export const formatAddressSmall = (address: Address) => address ? `${address.street}, ${address.number}` : ''
+export const formatAddressSmall = (address: Address) => {
+  if (!address) {
+    return ''
+  }
+
+  const [type, ...rest] = address.street.split(' ')
+
+  const typeSmall = type.length > 3 ? `${type.substring(0, 2)}` : type
+
+  return `${typeSmall} ${rest.join(' ')}, ${address.number}`
+}
+
+const degreesToRadians = (degrees: number) => (degrees * Math.PI) / 180;
+
 
 export const getDistance = ({ lat: lat1, lng: lng1 }: Address, { lat: lat2, lng: lng2 }: Address) => {
-  const radlat1 = Math.PI * lat1! / 180
-  const radlat2 = Math.PI * lat2! / 180
-  const theta = lng1! - lng2!
-  const radtheta = Math.PI * theta / 180
-  let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-  dist = Math.acos(dist)
-  dist = dist * 180 / Math.PI
-  dist = dist * 60 * 1.1515
+  const startingLat = degreesToRadians(lat1 as number);
+  const startingLong = degreesToRadians(lng1 as number);
+  const destinationLat = degreesToRadians(lat2 as number);
+  const destinationLong = degreesToRadians(lng2 as number);
 
-  const km = dist * 1.609344
+  // Radius of the Earth in kilometers
+  const radius = 6571;
 
-  return km < 1
-    ? (km * 1000).toFixed(0) + 'm'
-    : km.toFixed(2) + 'km'
+  // Haversine equation
+  const distanceInKilometers = Math.acos(Math.sin(startingLat) * Math.sin(destinationLat) +
+    Math.cos(startingLat) * Math.cos(destinationLat) *
+    Math.cos(startingLong - destinationLong)) * radius;
+
+  if (distanceInKilometers < 1) {
+    return `${(distanceInKilometers / 1000).toFixed(0)}m`
+  }
+
+  return `${distanceInKilometers.toFixed(1)}km`
 
 }
 

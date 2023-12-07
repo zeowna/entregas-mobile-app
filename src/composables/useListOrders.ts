@@ -34,7 +34,7 @@ const reset = () => {
     conditions: {},
     skip: 0,
     limit: 10,
-    sort: { statusUpdatedAt: -1 }
+    sort: { id: -1 }
   }
 }
 
