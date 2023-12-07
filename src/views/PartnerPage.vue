@@ -142,7 +142,7 @@ onMounted(async () => {
         }
       },
       {
-        text: 'Voltar para o Parceiro anterior',
+        text: 'Comprar deste parceiro',
         handler: async () => { 
           resetCart()
         }
