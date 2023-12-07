@@ -92,9 +92,13 @@ import {
 import { useListOrders, useOrder } from "@/composables";
 import AppHeader from "@/components/AppHeader.vue";
 import { centsToCurrency, formatOrderNumber, formatOrderStatus, getOrderStatusColorApp } from "@/utils";
-import { OrderStatus } from "@/services/api/types";
-import { onMounted, onUnmounted } from "vue";
+import { CustomerUser, Order, OrderStatus } from "@/services/api/types";
+import { computed, onMounted, onUnmounted } from "vue";
 import OrderDetailsModal from "@/views/OrderDetailsModal.vue";
+import { socket } from '@/services/socket/Socket';
+import { store } from '@/store';
+
+const user = computed<CustomerUser>(() => store.getters.getUser)
 
 const {
   shouldFindMoreOrders,
@@ -130,10 +134,23 @@ onMounted(async () => {
   await findOrders()
 
   await loading.dismiss()
+
+  socket.on(`customer-order-updated-${user.value.id}`, (order: Order) => {
+    const index = data.value.list.findIndex(({ id }) => order.id === id)
+
+    if (index > -1) {
+      data.value.list[index] = order
+      return
+    }
+
+    data.value.list.unshift(order)
+  })
 })
 
 onUnmounted(() => {
   reset()
+
+  socket.on(`customer-order-updated-${user.value.id}`, () => { return })
 })
 
 </script>

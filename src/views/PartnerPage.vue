@@ -42,7 +42,7 @@
               </ion-col>
             </ion-row>
             <ion-grid>
-              <ion-row v-for="partnerProduct in groupedPartnerProducts[group]" :key="partnerProduct.id">
+              <ion-row v-for="partnerProduct in groupedPartnerProducts[group]" :key="`partner-product${partnerProduct.id}`" @click="selectProductToShow(partnerProduct)">
                 <ion-col size="2">
                   {{ getCartProduct(partnerProduct?.id!)?.quantity || 0 }}
                 </ion-col>
@@ -50,10 +50,7 @@
                   <p>{{ partnerProduct.product!.name }} {{ partnerProduct.product!.size }}</p>
                   <b>+ R$ {{ (partnerProduct.value / 100).toFixed(2).replace('.', ',') }}</b>
                 </ion-col>
-                <ion-col size="2" @click="selectProductToShow(partnerProduct)">
-                  <!-- <ion-button size="small" @click="selectProductToShow(partnerProduct)">
-                    Ver
-                  </ion-button> -->
+                <ion-col size="2">
                   <ion-img :src="partnerProduct.product?.pictureURI" />
                 </ion-col>
               </ion-row>
@@ -94,7 +91,6 @@ import MapContainer from "@/components/MapContainer.vue";
 import { formatAddress } from "@/utils";
 import { PartnerProduct } from "@/services/api/types";
 import ProductDetailsModal from "@/views/ProductDetailsModal.vue";
-import ProductCartModal from "@/views/ProductCartModal.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import CustomerAddressSelectionCard from "@/components/CustomerAddressSelectionCard.vue";
 
@@ -134,6 +130,11 @@ onMounted(async () => {
 watch(() => productName.value, ()=> {
   filterByProductName()
 })
+
+// watch(() => selectedAddress.value, async ()=> {
+//   resetCart()
+//   await router.push('/tabs/partnersTab')
+// })
 
 onUnmounted(() => {
   reset()

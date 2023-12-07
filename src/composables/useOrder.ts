@@ -4,6 +4,7 @@ import { store } from "@/store";
 import { Api } from "@/services/api/Api";
 import { alertController, loadingController } from "@ionic/vue";
 import { useListOrders } from "@/composables/useListOrders";
+import { socket } from "@/services/socket/Socket";
 
 const orderVisible = ref(false)
 const user = computed<CustomerUser>(() => store.getters.getUser)
@@ -19,11 +20,16 @@ const toggleOrderModal = async (orderId?: number) => {
 
   if (!orderVisible.value) {
     reset()
-    return
+    
+    socket.on(`customer-order-updated-${user.value.id}`, () => { return })
   }
 
   if (orderId) {
     await findOrderById(orderId)
+
+    socket.on(`customer-order-updated-${user.value.id}`, (updatedOrder: Order) => {
+      order.value = updatedOrder
+    })
   }
 }
 

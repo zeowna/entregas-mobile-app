@@ -151,11 +151,11 @@ const {
   removeAddress
 } = useAddress()
 
-const { cart, reset: resetCart } = useCart()
+const { reset: resetCart } = useCart()
 const router = useRouter()
 
 const assignSelectedAddress = async (newAddress: Address) => {
-  if(cart.value.length && newAddress?.id !== selectedAddress.value?.id) {
+  if(newAddress?.id !== selectedAddress.value?.id) {
     const alert = await alertController.create({
       header: 'Deseja mudar o endereço para entrega?',
       message: 'Seu carrinho de compras será descartado',

@@ -41,6 +41,7 @@
                 {{ new Date(order.statusUpdatedAt as Date)?.toLocaleTimeString() }}</h4>
               <h2><b>Valor total: R$ {{ centsToCurrency(order.totalValue as number) }}</b></h2>
               <h3>{{ formatOrderPaymentMethod(order.paymentMethod) }}</h3>
+              <h4 v-if="order.changeValue">Troco para: {{ centsToCurrency(order.changeValue)  }}</h4>
             </ion-col>
           </ion-row>
 
@@ -87,7 +88,7 @@ import {
 import { useOrder } from "@/composables";
 import AppTitle from "@/components/AppTitle.vue";
 import MapContainer from "@/components/MapContainer.vue";
-import { Address, Order, OrderStatus } from "@/services/api/types";
+import { Address, OrderStatus } from "@/services/api/types";
 import { computed } from "vue";
 
 const { order, cancelOrder } = useOrder()
@@ -99,7 +100,7 @@ defineProps({
   }
 })
 
-const alreadySettled = computed(() => [OrderStatus.Settled, OrderStatus.CanceledByPartner, OrderStatus.CanceledByCustomer, OrderStatus.RefusedByPartner].includes(order!.value!.status as OrderStatus))
+const alreadySettled = computed(() => [OrderStatus.Settled, OrderStatus.CanceledByPartner, OrderStatus.CanceledByCustomer, OrderStatus.RefusedByPartner, OrderStatus.InDelivery].includes(order!.value!.status as OrderStatus))
 
 const emit = defineEmits(['close'])
 
