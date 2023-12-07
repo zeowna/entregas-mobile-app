@@ -84,6 +84,8 @@ import { ref } from 'vue';
 import EditMyDataModal from '@/views/EditMyDataModal.vue';
 import AppHeader from "@/components/AppHeader.vue";
 import { Api } from '@/services/api/Api';
+import { store } from '@/store';
+import { ActionTypes } from '@/store/actions';
 
 const file = ref()
 const { customer, signOut } = useMyData()
@@ -116,6 +118,7 @@ const uploadFile = async (e: any) => {
     const [selectedFile] = e.target.files
 
     await Api.customers.uploadPicture(customer.value.id as number, selectedFile as File)
+    await store.dispatch(ActionTypes.REFRESH_TOKEN, true)
   } catch (err) {
     const alert = await alertController.create({ header: 'Erro ao salvar foto', buttons: ['Ok' ]})
     await alert.present()
