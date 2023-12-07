@@ -5,6 +5,7 @@ import { CustomerAddressesResource } from "@/services/api/customerAddressesResou
 
 
 export class CustomersResource extends AbstractResource<CustomerUser> {
+
   protected url = '/customers'
 
   orders = new CustomerOrdersResource(this.client)
@@ -16,5 +17,9 @@ export class CustomersResource extends AbstractResource<CustomerUser> {
 
   async update(id: number, entity: CustomerUser) {
     return super.patch(`${this.url}/${id}`, entity)
+  }
+
+  async uploadPicture(id: number, file: File) {
+    return this.postMultipart(`${this.url}/${id}/pictures`, file)
   }
 }

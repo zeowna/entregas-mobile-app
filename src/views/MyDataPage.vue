@@ -21,8 +21,9 @@
 
           <ion-row>
             <ion-col size="sm">
-              <ion-avatar class="ion-text-center">
+              <ion-avatar class="ion-text-center" @click="selectFile">
                 <ion-img :src="customer?.profilePictureURI || avatarPlaceholderURI"/>
+                <input type="file" ref="file" @change="uploadFile($event)" v-show="false" />
               </ion-avatar>
             </ion-col>
             <ion-col size="auto" class="personal-data">
@@ -72,7 +73,9 @@ import {
   IonPage,
   IonRow,
   IonTitle,
-  IonToolbar
+  IonToolbar,
+alertController,
+loadingController
 } from '@ionic/vue';
 import { exitOutline, personCircle } from "ionicons/icons";
 import AppTitle from "@/components/AppTitle.vue";
@@ -80,7 +83,9 @@ import { useMyData } from '@/composables';
 import { ref } from 'vue';
 import EditMyDataModal from '@/views/EditMyDataModal.vue';
 import AppHeader from "@/components/AppHeader.vue";
+import { Api } from '@/services/api/Api';
 
+const file = ref()
 const { customer, signOut } = useMyData()
 const visible = ref(false)
 
@@ -92,6 +97,31 @@ const openEditMyDataModal = () => {
 
 const close = () => {
   visible.value = false
+}
+
+const selectFile = () => {
+  file.value.click()
+}
+
+const uploadFile = async (e: any) => {
+  if (!e.target.files.length) {
+    return
+  }
+
+  const loading = await loadingController.create({ message: 'Salvando...' })
+
+  try {
+    await loading.present()
+
+    const [selectedFile] = e.target.files
+
+    await Api.customers.uploadPicture(customer.value.id as number, selectedFile as File)
+  } catch (err) {
+    const alert = await alertController.create({ header: 'Erro ao salvar foto', buttons: ['Ok' ]})
+    await alert.present()
+  } finally {
+    await loading.dismiss()
+  }
 }
 
 </script>
