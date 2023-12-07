@@ -133,7 +133,7 @@ onMounted(async () => {
 
   await loading.dismiss()
 
-  if(cartPartner.value && (partner.id !== cartPartner?.id)) {
+  if(cartPartner.value && (partner.value?.id !== cartPartner.value?.id)) {
     const alert = await alertController.create({ header: 'Você já estava comprando de outro Parceiro', buttons: [
       { 
         text: 'Voltar para o Parceiro anterior',
